@@ -1,0 +1,44 @@
+.env
+.DS_Store
+
+.gradle
+
+/build/*
+!/build/reports/
+/build/reports/*
+!/build/reports/.gitkeep
+!/build/test-results/
+/build/test-results/*
+!/build/test-results/.gitkeep
+
+/db/*
+!/db/.gitkeep
+
+/logs/*
+!/logs/.gitkeep
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/

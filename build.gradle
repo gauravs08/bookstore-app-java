@@ -1,0 +1,84 @@
+plugins {
+    id 'org.springframework.boot' version '3.2.1'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.cyclonedx.bom' version '1.8.1'
+    id 'com.github.ben-manes.versions' version '0.50.0'
+    id 'com.adarshr.test-logger' version '4.0.0'
+
+    id 'java'
+    id 'idea'
+}
+
+group = 'fi.epassi'
+
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://plugins.gradle.org/m2/' }
+}
+
+ext {
+    set('springCloudVersion', '2023.0.0')
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // -- Clients & Logging
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.zalando:logbook-spring-boot-starter:3.2.0'
+
+    // -- Exception handling
+    implementation 'org.zalando:problem-violations:0.29.1'
+    implementation 'org.zalando:problem-spring-web:0.29.1'
+
+    // -- DB
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.h2database:h2:2.2.224'
+    implementation 'org.flywaydb:flyway-core:9.19.4'
+    implementation 'org.flywaydb:flyway-mysql:9.19.4'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+
+    // -- Others
+    implementation 'org.apache.commons:commons-lang3:3.0'
+
+    // -- Tests
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // -- Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+testlogger {
+    theme 'mocha-parallel'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
