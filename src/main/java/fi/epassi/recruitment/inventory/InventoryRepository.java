@@ -1,18 +1,14 @@
-package fi.epassi.recruitment.book;
+package fi.epassi.recruitment.inventory;
+
+import fi.epassi.recruitment.book.BookModel;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BookRepository extends JpaRepository<BookModel, UUID> {
+public interface InventoryRepository extends JpaRepository<InventoryModel, UUID> {
 
-    Optional<BookModel> findByIsbn(UUID isbn);
-
-    List<BookModel> findByTitle(String title);
-
-    List<BookModel> findByAuthor(String author);
-
-    List<BookModel> findByAuthorAndTitle(String author, String title);
+    Optional<InventoryModel> findByIsbn(UUID isbn);
 
 }

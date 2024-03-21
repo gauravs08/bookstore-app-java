@@ -4,6 +4,7 @@ import static java.math.BigDecimal.TEN;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -14,9 +15,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import fi.epassi.recruitment.BaseIntegrationTest;
 import java.util.UUID;
+
+import fi.epassi.recruitment.inventory.InventoryRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +49,16 @@ class BookControllerTest extends BaseIntegrationTest {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
     @Test
     @SneakyThrows
     void shouldCreateBookAndReturnId() {
+        UUID EXAMPLE_UUID = UUID.randomUUID();
+
         // Given
-        var bookDto = BookDto.builder().isbn(UUID.randomUUID()).title("The Two Towers").author("J.R.R Tolkien").price(TEN).build();
+        var bookDto = BookDto.builder().isbn(EXAMPLE_UUID).title("The Two Towers").author("J.R.R Tolkien").price(TEN).build();
         var bookDtoJson = mapper.writeValueAsString(bookDto);
 
         // When
@@ -60,6 +69,8 @@ class BookControllerTest extends BaseIntegrationTest {
         // Then
         response.andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.response", is(notNullValue())));
+
+        assertTrue(inventoryRepository.findByIsbn(EXAMPLE_UUID).isPresent());
     }
 
     @Test

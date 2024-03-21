@@ -3,6 +3,9 @@ package fi.epassi.recruitment.book;
 import fi.epassi.recruitment.exception.BookNotFoundException;
 import java.util.List;
 import java.util.UUID;
+
+import fi.epassi.recruitment.inventory.InventoryRepository;
+import fi.epassi.recruitment.inventory.InventoryService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -13,10 +16,12 @@ import org.springframework.stereotype.Service;
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final InventoryService inventoryService;
 
     public UUID createBook(BookDto bookDto) {
         BookModel bookModel = toBookModel(bookDto);
         var savedBook = bookRepository.save(bookModel);
+        inventoryService.saveOrUpdateInventory(savedBook.getIsbn(),1);
         return savedBook.getIsbn();
     }
 

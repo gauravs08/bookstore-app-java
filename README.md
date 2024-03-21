@@ -131,6 +131,13 @@ and [BookModel](src/main/java/fi/epassi/recruitment/book/BookModel.java) for sto
 Note: each response is encapsulated in [ApiResponse](src/main/java/fi/epassi/recruitment/api/ApiResponse.java) entity, which we use, to make sure that
 we will always have the same structure of the response.
 
+## Health Check
+- `http://localhost:8080/actuator/health`
+- `{"status": "UP"}`
+
+## Swagger-ui
+http://localhost:8080/swagger-ui/index.html
+
 ## Your assignments
 
 Before working on the tasks, make sure, that you have initialized fresh git repository.

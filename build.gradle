@@ -34,6 +34,9 @@ dependencies {
     // -- swagger integration
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
 
+    // -- actuator health check
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     // -- Clients & Logging
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation 'org.zalando:logbook-spring-boot-starter:3.2.0'

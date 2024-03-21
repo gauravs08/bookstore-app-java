@@ -2,9 +2,9 @@ package fi.epassi.recruitment.exception;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-public class BookNotFoundException extends ApplicationException {
+public class InventoryNotFoundException extends ApplicationException {
 
-    public BookNotFoundException(final String isbn) {
-        super(NOT_FOUND, "No book found with ISBN {%s}".formatted(isbn));
+    public InventoryNotFoundException(final String isbn) {
+        super(NOT_FOUND, "No inventory found with ISBN {%s}".formatted(isbn));
     }
 }
