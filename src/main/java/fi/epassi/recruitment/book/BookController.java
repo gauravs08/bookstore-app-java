@@ -3,10 +3,20 @@ package fi.epassi.recruitment.book;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import fi.epassi.recruitment.api.ApiResponse;
-import java.util.List;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+
+import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +37,32 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    ApiResponse<List<BookDto>> getBooks(
+    ApiResponse<BookDto> getBooks(
         @RequestParam(value = "author", required = false) String author,
-        @RequestParam(value = "title", required = false) String title) {
-        return ApiResponse.ok(bookService.getBooks(author, title));
+        @RequestParam(value = "title", required = false) String title,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "20") int size) {
+        Page<BookDto> bookPage =  bookService.getBooks(author, title, PageRequest.of(page, size, Sort.unsorted()));
+        return ApiResponse.okWithPagination(bookPage);
+
     }
+//    @GetMapping
+//    ResponseEntity<Object> getBooks(
+//            @RequestParam(value = "author", required = false) String author,
+//            @RequestParam(value = "title", required = false) String title,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "20") int size) {
+//        Page<BookDto> bookPage =  bookService.getBooks(author, title, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("content", bookPage.getContent());
+//        response.put("pageNumber", bookPage.getNumber());
+//        response.put("pageSize", bookPage.getSize());
+//        response.put("totalPages", bookPage.getTotalPages());
+//        response.put("totalElements", bookPage.getTotalElements());
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//
+//    }
 
     @PostMapping
     ApiResponse<UUID> createBook(@RequestBody @Validated BookDto bookDto) {

@@ -10,6 +10,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,8 +28,8 @@ public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
     // Get copies by author
-    public InventoryDto getCopiesByAuthor(String author) {
-        List<BookModel> books = bookRepository.findByAuthor(author);
+    public InventoryDto getCopiesByAuthor(String author, Pageable pageable) {
+        Page<BookModel> books = bookRepository.findByAuthor(author, pageable);
         int totalCopies = 0;
         for (BookModel book : books) {
             InventoryModel inventory = inventoryRepository.findByIsbn(book.getIsbn())
@@ -40,8 +42,8 @@ public class InventoryService {
     }
 
     // Get copies by title
-    public InventoryDto getCopiesByTitle(String title) {
-        List<BookModel> books = bookRepository.findByTitle(title);
+    public InventoryDto getCopiesByTitle(String title, Pageable pageable) {
+        Page<BookModel> books = bookRepository.findByTitle(title, pageable);
         int totalCopies = 0;
         for (BookModel book : books) {
             InventoryModel inventory = inventoryRepository.findByIsbn(book.getIsbn())

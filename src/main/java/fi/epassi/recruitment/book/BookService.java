@@ -9,6 +9,9 @@ import fi.epassi.recruitment.inventory.InventoryService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,16 +39,24 @@ public class BookService {
     }
 
 
-    public List<BookDto> getBooks(String author, String title) {
+    public Page<BookDto> getBooks(String author, String title, Pageable pageable) {
         if (StringUtils.isNotBlank(author) && StringUtils.isNotBlank(title)) {
-            return bookRepository.findByAuthorAndTitle(author, title).stream().map(BookService::toBookDto).toList();
+            return bookRepository.findByAuthorAndTitle(author, title, pageable)
+                    //.stream()
+                    .map(BookService::toBookDto);
+                    //.toList());
         } else if (StringUtils.isNotBlank(author) && StringUtils.isBlank(title)) {
-            return bookRepository.findByAuthor(author).stream().map(BookService::toBookDto).toList();
+            return bookRepository.findByAuthor(author, pageable)
+                    //.stream()
+                    .map(BookService::toBookDto);
         } else if (StringUtils.isNotBlank(title) && StringUtils.isBlank(author)) {
-            return bookRepository.findByTitle(title).stream().map(BookService::toBookDto).toList();
+            return bookRepository.findByTitle(title, pageable)
+                    //.stream()
+                    .map(BookService::toBookDto);
+                    //.toList());
         }
 
-        return bookRepository.findAll().stream().map(BookService::toBookDto).toList();
+        return bookRepository.findAll(pageable).map(BookService::toBookDto);
     }
 
     public UUID updateBook(BookDto bookDto) {

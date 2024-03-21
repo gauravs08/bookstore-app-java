@@ -2,6 +2,7 @@ package fi.epassi.recruitment.book;
 
 import static java.sql.Types.VARCHAR;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

@@ -3,6 +3,7 @@ package fi.epassi.recruitment.inventory;
 import fi.epassi.recruitment.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,14 +27,14 @@ public class InventoryController {
 
     @GetMapping("/author/{author}/copies")
     ApiResponse<InventoryDto> getInventoryCopiesByAuthor(
-            @PathVariable("author") String author) {
-        return ApiResponse.ok(inventoryService.getCopiesByAuthor(author));
+            @PathVariable("author") String author, Pageable pageable) {
+        return ApiResponse.ok(inventoryService.getCopiesByAuthor(author, pageable));
     }
 
     @GetMapping("/title/{title}/copies")
     ApiResponse<InventoryDto> getInventoryCopiesByTitle(
-            @PathVariable("title") String title) {
-        return ApiResponse.ok(inventoryService.getCopiesByTitle(title));
+            @PathVariable("title") String title, Pageable pageable) {
+        return ApiResponse.ok(inventoryService.getCopiesByTitle(title, pageable));
     }
 
     @PutMapping("/isbn/{isbn}/copies")
