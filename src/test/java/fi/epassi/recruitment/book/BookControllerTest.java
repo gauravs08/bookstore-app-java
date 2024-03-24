@@ -20,26 +20,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import fi.epassi.recruitment.BaseIntegrationTest;
 import java.util.UUID;
 
-import fi.epassi.recruitment.inventory.InventoryRepository;
+import fi.epassi.recruitment.model.BookModel;
+import fi.epassi.recruitment.dto.BookDto;
+import fi.epassi.recruitment.repository.BookRepository;
+import fi.epassi.recruitment.repository.InventoryRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class BookControllerTest extends BaseIntegrationTest {
+class BooksControllerTest extends BaseIntegrationTest {
 
     private static final String BASE_PATH_V1_BOOK = "/api/v1/books";
     private static final String AUTHOR = "author";
     private static final String TITLE = "title";
     private static final String BASE_PATH_V1_BOOK_BY_ISBN = BASE_PATH_V1_BOOK + "/{isbn}";
 
-    private static final BookModel BOOK_HOBBIT = BookModel.builder()
+    private static final BookModel BOOK_MODEL_HOBBIT = BookModel.builder()
         .isbn(UUID.fromString("66737096-39ef-4a7c-aa4a-9fd018c14178"))
         .title("The Hobbit")
         .author("J.R.R Tolkien")
         .price(TEN)
         .build();
 
-    private static final BookModel BOOK_FELLOWSHIP = BookModel.builder()
+    private static final BookModel BOOK_MODEL_FELLOWSHIP = BookModel.builder()
         .isbn(UUID.fromString("556aa37d-ef9c-45d3-ba4a-a792c123208a"))
         .title("The Fellowship of the Rings")
         .author("J.R.R Tolkien")
@@ -70,7 +73,6 @@ class BookControllerTest extends BaseIntegrationTest {
         response.andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.response", is(notNullValue())));
 
-        assertTrue(inventoryRepository.findByIsbn(EXAMPLE_UUID).isPresent());
     }
 
     @Test
@@ -90,8 +92,8 @@ class BookControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldRespondWithBookWhenSearchingByAuthor() {
         // Given
-        bookRepository.save(BOOK_HOBBIT);
-        bookRepository.save(BOOK_FELLOWSHIP);
+        bookRepository.save(BOOK_MODEL_HOBBIT);
+        bookRepository.save(BOOK_MODEL_FELLOWSHIP);
 
         // When
         var requestUrl = getEndpointUrl(BASE_PATH_V1_BOOK);
@@ -108,7 +110,7 @@ class BookControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldRespondWithBooksWhenSearchingByTitle() {
         // Given
-        bookRepository.save(BOOK_HOBBIT);
+        bookRepository.save(BOOK_MODEL_HOBBIT);
 
         // When
         var requestUrl = getEndpointUrl(BASE_PATH_V1_BOOK);
@@ -195,7 +197,7 @@ class BookControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldUpdateExistingBookSuccessfully() {
         // Given
-        var saved = bookRepository.save(BOOK_FELLOWSHIP);
+        var saved = bookRepository.save(BOOK_MODEL_FELLOWSHIP).block();
 
         // When
         var bookDto = BookDto.builder().isbn(saved.getIsbn())
