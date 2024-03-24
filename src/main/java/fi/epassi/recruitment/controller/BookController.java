@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,47 +44,34 @@ public class BookController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size) {
         Flux<BookDto> bookFlux =  bookService.getBooks(author, title, PageRequest.of(page, size, Sort.unsorted()));
-        //long totalElements = bookflux.count().block();
-        //int totalPages = ... // Calculate total pages from the flux and size
-        //return ApiResponsePage.okWithPagination(bookflux, totalElements, totalPages, page, size);
-
-        return bookFlux.count()
-                .map(totalElements -> {
-                    int totalPages = (int) Math.ceil((double) totalElements / size);
-                    return ApiResponsePage.okWithPagination(bookFlux, totalElements, totalPages, page, size);
-                })
-                .flux()
-                .switchIfEmpty(Mono.error(new BookNotFoundException()));
-
+        return bookFlux.collectList().flatMapMany(bookList -> {
+            long totalElements = bookList.size();
+            int totalPages = (int) Math.ceil((double) totalElements / size);
+            if (totalElements == 0) {
+                return Mono.error(new BookNotFoundException());
+            } else {
+                return ApiResponsePage.okWithPagination(bookFlux, totalElements, totalPages, page, size);
+            }
+        });
+//             return bookFlux.count()
+//                .map(totalElements -> {
+//                    int totalPages = (int) Math.ceil((double) totalElements / size);
+//                    return ApiResponsePage.okWithPagination(bookFlux, totalElements, totalPages, page, size);
+//                })
+//                .flux()
+//                .switchIfEmpty(Mono.error(new BookNotFoundException()));
     }
-//    @GetMapping
-//    ResponseEntity<Object> getBooks(
-//            @RequestParam(value = "author", required = false) String author,
-//            @RequestParam(value = "title", required = false) String title,
-//            @RequestParam(defaultValue = "0") int page,
-//            @RequestParam(defaultValue = "20") int size) {
-//        Page<BookDto> bookPage =  bookService.getBooks(author, title, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("content", bookPage.getContent());
-//        response.put("pageNumber", bookPage.getNumber());
-//        response.put("pageSize", bookPage.getSize());
-//        response.put("totalPages", bookPage.getTotalPages());
-//        response.put("totalElements", bookPage.getTotalElements());
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//
-//    }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    ApiResponse<UUID> createBook(@RequestBody @Validated BookDto bookDto) {
-        var isbn = bookService.createBook(bookDto);
-        return ApiResponse.ok(isbn);
+    Mono<ApiResponse<UUID>> createBook(@RequestBody @Validated BookDto bookDto) {
+        return bookService.createBook(bookDto)
+                .map(ApiResponse::ok);
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
-    ApiResponse<UUID> updateBook(@RequestBody @Validated BookDto bookDto) {
-        var ret = bookService.updateBook(bookDto);
-        return ApiResponse.ok(ret);
+    Mono<ApiResponse<UUID>> updateBook(@RequestBody @Validated BookDto bookDto) {
+        return bookService.updateBook(bookDto)
+                .map(ApiResponse::ok);
     }
 
     @GetMapping(value = "/{isbn}",produces = APPLICATION_JSON_VALUE)
@@ -90,13 +79,17 @@ public class BookController {
         //return ApiResponse.ok(bookService.getBookByIsbn(isbn));
         return bookService.getBookByIsbn(isbn)
                 .map(ApiResponse::ok)
-                .switchIfEmpty(Mono.error(new BookNotFoundException(isbn.toString())));
+                .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN",isbn.toString())));
 
     }
     @DeleteMapping(value = "/{isbn}")
     ApiResponse<Void> deleteBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
-        bookService.deleteBookWithIsbn(isbn);
-        return ApiResponse.ok();
+        try {
+            bookService.deleteBookWithIsbn(isbn);
+            return ApiResponse.ok();
+        } catch (BookNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found", ex);
+        }
     }
 
 }

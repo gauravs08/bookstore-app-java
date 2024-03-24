@@ -1,9 +1,10 @@
 package fi.epassi.recruitment.inventory;
 
 import fi.epassi.recruitment.BaseIntegrationTest;
-import fi.epassi.recruitment.book.BookModel;
-import fi.epassi.recruitment.book.BookRepository;
-import fi.epassi.recruitment.inventory.InventoryDto;
+import fi.epassi.recruitment.model.BookModel;
+import fi.epassi.recruitment.model.Inventory;
+import fi.epassi.recruitment.repository.BookRepository;
+import fi.epassi.recruitment.repository.InventoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,7 @@ class InventoryControllerTest extends BaseIntegrationTest {
     @Test
     void shouldGetInventoryCopiesByIsbn() throws Exception {
         // Given
-        inventoryRepository.save(new InventoryModel(EXAMPLE_ISBN, 10));
+        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 10,false));
 
         // When
         ResultActions result = mvc.perform(get(BASE_PATH_V1_INVENTORY + "/isbn/{isbn}/copies", EXAMPLE_ISBN)
@@ -49,8 +50,8 @@ class InventoryControllerTest extends BaseIntegrationTest {
     @Test
     void shouldGetInventoryCopiesByAuthor() throws Exception {
         // Given
-        bookRepository.save(new BookModel(EXAMPLE_ISBN,EXAMPLE_TITLE,EXAMPLE_AUTHOR,new BigDecimal(15.0)));
-        inventoryRepository.save(new InventoryModel(EXAMPLE_ISBN, 5)); // 5 copies for the example author
+        bookRepository.save(new BookModel(EXAMPLE_ISBN,EXAMPLE_TITLE,EXAMPLE_AUTHOR,new BigDecimal(15.0),true));
+        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 5,true)); // 5 copies for the example author
 
         // When
         ResultActions result = mvc.perform(get(BASE_PATH_V1_INVENTORY + "/author/{author}/copies", EXAMPLE_AUTHOR)
@@ -65,8 +66,8 @@ class InventoryControllerTest extends BaseIntegrationTest {
     @Test
     void shouldGetInventoryCopiesByTitle() throws Exception {
         // Given
-        bookRepository.save(new BookModel(EXAMPLE_ISBN,EXAMPLE_TITLE,EXAMPLE_AUTHOR,new BigDecimal(15.0)));
-        inventoryRepository.save(new InventoryModel(EXAMPLE_ISBN, 7)); // 7 copies for the example title
+        bookRepository.save(new BookModel(EXAMPLE_ISBN,EXAMPLE_TITLE,EXAMPLE_AUTHOR,new BigDecimal(15.0),true));
+        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 7,true)); // 7 copies for the example title
 
         // When
         ResultActions result = mvc.perform(get(BASE_PATH_V1_INVENTORY + "/title/{title}/copies", EXAMPLE_TITLE)
@@ -89,7 +90,7 @@ class InventoryControllerTest extends BaseIntegrationTest {
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath("$.title").value("Not Found"))
-                .andExpect(jsonPath("$.detail").value("No inventory found with ISBN {%s}".formatted(NON_EXISTING_ISBN)));
+                .andExpect(jsonPath("$.detail").value("No inventory found with ISBN: {%s}".formatted(NON_EXISTING_ISBN)));
     }
 
     @Test
@@ -102,7 +103,7 @@ class InventoryControllerTest extends BaseIntegrationTest {
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath("$.title").value("Not Found"))
-                .andExpect(jsonPath("$.detail").value("No inventory found with ISBN {%s}".formatted(NON_EXISTING_ISBN)));
+                .andExpect(jsonPath("$.detail").value("No inventory found with ISBN: {%s}".formatted(NON_EXISTING_ISBN)));
 
     }
 
@@ -116,7 +117,7 @@ class InventoryControllerTest extends BaseIntegrationTest {
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath("$.title").value("Not Found"))
-                .andExpect(jsonPath("$.detail").value("No inventory found with ISBN {%s}".formatted(NON_EXISTING_ISBN)));
+                .andExpect(jsonPath("$.detail").value("No inventory found with ISBN: {%s}".formatted(NON_EXISTING_ISBN)));
 
     }
 }

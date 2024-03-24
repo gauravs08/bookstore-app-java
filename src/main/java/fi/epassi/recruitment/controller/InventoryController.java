@@ -1,6 +1,7 @@
 package fi.epassi.recruitment.controller;
 
 import fi.epassi.recruitment.api.ApiResponse;
+import fi.epassi.recruitment.dto.BookDto;
 import fi.epassi.recruitment.exception.InventoryNotFoundException;
 import fi.epassi.recruitment.dto.InventoryDto;
 import fi.epassi.recruitment.dto.InventoryGlobalDto;
@@ -49,8 +50,10 @@ public class InventoryController {
     }
 
     @PutMapping(value = "/isbn/{isbn}/copies", consumes = APPLICATION_JSON_VALUE)
-    Mono<ApiResponse<UUID>> updateInventoriesCopiesByIsbn(@RequestBody @Validated InventoryDto inventoryDto) {
-        return inventoryService.updateInventory(inventoryDto)
+    Mono<ApiResponse<UUID>> updateInventoriesCopiesByIsbn(
+            @PathVariable("isbn") @Validated UUID isbn,
+            @RequestBody @Validated Integer copies) {
+        return inventoryService.updateInventory(isbn,copies)
                 .map(ApiResponse::ok);
     }
 

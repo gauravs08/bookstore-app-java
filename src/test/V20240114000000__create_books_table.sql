@@ -1,4 +1,4 @@
-CREATE TABLE `books`
+CREATE TABLE `bookModel`
 (
     `id`     varchar(36)    NOT NULL,
     `author` varchar(64)    NOT NULL,

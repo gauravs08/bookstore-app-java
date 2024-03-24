@@ -16,7 +16,7 @@ The Bookstore is not yet open, as we're still working on the technical side of t
 
 For now, we're in the phase where we have very limited functionality, and we still need to deliver a few more things for the grand opening.
 
-At this stage, we're able to create, update, read & delete books in our global inventory.\
+At this stage, we're able to create, update, read & delete bookModel in our global inventory.\
 Worth mentioning: in order to simplify some parts of project, we're using UUID as ISBN (International Standard Book Number).
 
 ## Technical information
@@ -85,22 +85,22 @@ When you will start the project or run the tests the database file will be creat
 
 Available REST API methods:
 
-1. Get list of all books: `GET /api/v1/books`, responds with body of `List<BookDto>`.
+1. Get list of all bookModel: `GET /api/v1/bookModel`, responds with body of `List<BookDto>`.
 
 ```bash
-curl -X GET 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json'
+curl -X GET 'http://localhost:8080/api/v1/bookModel' -H 'Content-Type: application/json'
 ```
 
-2. Get book by ISBN: `GET /api/v1/books/{isbn}`, responds with body of `BookDto`.
+2. Get bookModel by ISBN: `GET /api/v1/bookModel/{isbn}`, responds with body of `BookDto`.
 
 ```bash
-curl -X GET 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json' 
+curl -X GET 'http://localhost:8080/api/v1/bookModel/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json' 
 ```
 
-3. Create a book: `POST /api/v1/book`, responds with body of ISBN string.
+3. Create a bookModel: `POST /api/v1/bookModel`, responds with body of ISBN string.
 
 ```bash
-curl -X POST 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json' --data-raw '{
+curl -X POST 'http://localhost:8080/api/v1/bookModel' -H 'Content-Type: application/json' --data-raw '{
    "isbn": "5e0a115e-3160-4690-a7fe-50689cb23e68",
    "title": "Lorem ipsum",
    "author": "Cicero",
@@ -108,10 +108,10 @@ curl -X POST 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/
 }'
 ```
 
-4. Update a book: `PUT /api/v1/book`, responds with body of ISBN string.
+4. Update a bookModel: `PUT /api/v1/bookModel`, responds with body of ISBN string.
 
 ```bash
-curl -X PUT 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json' --data-raw '{
+curl -X PUT 'http://localhost:8080/api/v1/bookModel' -H 'Content-Type: application/json' --data-raw '{
    "isbn": "5e0a115e-3160-4690-a7fe-50689cb23e68",
    "title": "Lorem ipsum",
    "author": "Cicero",
@@ -119,22 +119,37 @@ curl -X PUT 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/j
 }'
 ```
 
-5. Delete a book by ISBN: `DELETE /api/v1/books/{isbn}`, responds without body, response status 200 OK.
+5. Delete a bookModel by ISBN: `DELETE /api/v1/bookModel/{isbn}`, responds without body, response status 200 OK.
 
 ```bash
-curl -X DELETE 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json'
+curl -X DELETE 'http://localhost:8080/api/v1/bookModel/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json'
 ```
 
-We are using [BookDto](src/main/java/fi/epassi/recruitment/book/BookDto.java) in the communication,
-and [BookModel](src/main/java/fi/epassi/recruitment/book/BookModel.java) for storing Book information in the database.
+We are using [BookDto](src/main/java/fi/epassi/recruitment/bookModel/BookDto.java) in the communication,
+and [BookModel](src/main/java/fi/epassi/recruitment/bookModel/BookModel.java) for storing Book information in the database.
 
 Note: each response is encapsulated in [ApiResponse](src/main/java/fi/epassi/recruitment/api/ApiResponse.java) entity, which we use, to make sure that
 we will always have the same structure of the response.
 
-## Health Check
-- `http://localhost:8080/actuator/health`
-- `{"status": "UP"}`
+## Analyze Performance Metrics
+Actuator endpoints provide various performance metrics and information about your application. Here are some commonly used endpoints for performance monitoring:
 
+- `http://localhost:8080/actuator/metrics` \
+Provides various metrics such as JVM memory usage, CPU usage, HTTP request metrics, database connection pool metrics, etc.
+
+
+- `http://localhost:8080/actuator/health` \
+Shows the health status of your application and its dependencies. It can be used to check if your application is up and running properly.
+
+- `http://localhost:8080/actuator/threaddump`: \ 
+Generates a thread dump of your application, which can be useful for analyzing thread activity and identifying thread-related issues.
+
+- `http://localhost:8080/actuator/env`: \
+Displays environment properties and configuration settings of your application.
+
+- `http://localhost:8080/actuator/info`: \
+Shows custom application information and metadata.
+- 
 ## Swagger-ui
 http://localhost:8080/swagger-ui/index.html
 
@@ -146,29 +161,29 @@ Before working on the tasks, make sure, that you have initialized fresh git repo
 
 - **Backstory**:\
   We have some time before the grand opening of the Bookstore, and we are still missing the most important feature.\
-  We do not have the possibility to know how many books we have available to sell (how many book copies we have in the Inventory).
+  We do not have the possibility to know how many bookModel we have available to sell (how many bookModel copies we have in the Inventory).
 
 
 - **Assigment description**:\
-  You need to add the possibility to store information about how many books we have in our global inventory.\
+  You need to add the possibility to store information about how many bookModel we have in our global inventory.\
   Also, when introducing such feature, we should have an API with capabilities of:
-    - Returning number of book copies that we have in Inventory by ISBN.
-    - Returning number of book copies that we have in Inventory by Author.
-    - Returning number of book copies that we have in Inventory by Title.
-    - Updating number of book copies that we have in the Bookstore Inventory.
+    - Returning number of bookModel copies that we have in Inventory by ISBN.
+    - Returning number of bookModel copies that we have in Inventory by Author.
+    - Returning number of bookModel copies that we have in Inventory by Title.
+    - Updating number of bookModel copies that we have in the Bookstore Inventory.
 
-  Note, that the endpoint for managing book entities should not be changed.\
-  The book availability (number of copies) should be separate information, available via separate API.
+  Note, that the endpoint for managing bookModel entities should not be changed.\
+  The bookModel availability (number of copies) should be separate information, available via separate API.
 
 ### Task #2 - First issues & technical debt impact
 
 - **Backstory**:\
   Initially, we did an MVP (Minimum Viable Product) implementation, where all Books are being listed at once, on a single long page.
   We have also added the possibility to search for Books by Authors or Titles, which helped a lot.\
-  In a very short time, we got pretty successful, with more than tens of thousands of books in the inventory.\
-  Hence, the actual solution is no longer working, as there are too many books showing on a single page.\
+  In a very short time, we got pretty successful, with more than tens of thousands of bookModel in the inventory.\
+  Hence, the actual solution is no longer working, as there are too many bookModel showing on a single page.\
   We need to add the possibility of returning only part of the data.\
-  Also, for some time already, people are complaining that listing all the books takes a really long time, so we should also look into it as well.
+  Also, for some time already, people are complaining that listing all the bookModel takes a really long time, so we should also look into it as well.
 
 
 - **Assigment description**:\
@@ -178,9 +193,9 @@ Before working on the tasks, make sure, that you have initialized fresh git repo
 
 - **Backstory**:\
   The business is now super successful.\
-  We are now selling thousands of books every day, with over a million books in the inventory.\
+  We are now selling thousands of bookModel every day, with over a million bookModel in the inventory.\
   As a company, we have invested and bought 5 buildings in different cities, in order to open other branches of the business there.\
-  Also, we will as well start selling books online!
+  Also, we will as well start selling bookModel online!
 
 
 - **Assigment description**:\

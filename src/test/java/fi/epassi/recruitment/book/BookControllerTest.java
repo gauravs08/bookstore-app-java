@@ -27,8 +27,9 @@ import fi.epassi.recruitment.repository.InventoryRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-class BooksControllerTest extends BaseIntegrationTest {
+class BookControllerTest extends BaseIntegrationTest {
 
     private static final String BASE_PATH_V1_BOOK = "/api/v1/books";
     private static final String AUTHOR = "author";
@@ -40,13 +41,14 @@ class BooksControllerTest extends BaseIntegrationTest {
         .title("The Hobbit")
         .author("J.R.R Tolkien")
         .price(TEN)
+        .newBook(false)
         .build();
 
     private static final BookModel BOOK_MODEL_FELLOWSHIP = BookModel.builder()
         .isbn(UUID.fromString("556aa37d-ef9c-45d3-ba4a-a792c123208a"))
         .title("The Fellowship of the Rings")
         .author("J.R.R Tolkien")
-        .price(TEN)
+        .price(TEN).newBook(false)
         .build();
 
     @Autowired
@@ -209,6 +211,8 @@ class BooksControllerTest extends BaseIntegrationTest {
 
         var response = mvc.perform(put(getEndpointUrl(BASE_PATH_V1_BOOK)).contentType(APPLICATION_JSON).content(bookDtoJson));
 
+        var responseBody = response.andReturn().getResponse().getContentAsString();
+        System.out.println("responseBody------"+responseBody);
         // Then
         response.andExpect(status().is2xxSuccessful())
             .andExpect(jsonPath("$.status_code", is(OK.value())));

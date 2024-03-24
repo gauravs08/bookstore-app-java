@@ -1,6 +1,6 @@
 package fi.epassi.recruitment.services;
 
-import fi.epassi.recruitment.model.Books;
+import fi.epassi.recruitment.model.BookModel;
 import fi.epassi.recruitment.dto.BookDto;
 import fi.epassi.recruitment.repository.BookRepository;
 import fi.epassi.recruitment.exception.BookNotFoundException;
@@ -8,7 +8,6 @@ import fi.epassi.recruitment.exception.BookNotFoundException;
 import java.util.UUID;
 
 import fi.epassi.recruitment.repository.InventoryRepository;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -27,61 +26,59 @@ public class BookService {
     private final BookRepository bookRepository;
     private final InventoryRepository inventoryRepository;
 
+//    @Autowired
 //    public BookService(BookRepository bookRepository, InventoryRepository inventoryRepository){
 //        this.bookRepository=bookRepository;
 //        this.inventoryRepository=inventoryRepository;
 //    }
-    public UUID createBook(BookDto bookDto) {
-        Books books = toBookModel(bookDto);
-        var savedBook = bookRepository.save(books).block();
-        //inventoryRepository.saveOrUpdateInventory(savedBook.getIsbn(),1);
-        return savedBook.getIsbn();
+    public Mono<UUID> createBook(BookDto bookDto) {
+        BookModel bookModel = toBookModel(bookDto);
+        bookModel.setAsNew();
+        return bookRepository.save(bookModel)
+                .map(BookModel::getIsbn);
     }
 
-    public void deleteBookWithIsbn(@NonNull UUID isbn) {
-        bookRepository.deleteById(isbn);
+    public Mono<Void> deleteBookWithIsbn(@NonNull UUID isbn) {
+        return bookRepository.deleteById(isbn);
+
     }
 
     @Cacheable(key = "{#isbn}")
     public Mono<BookDto> getBookByIsbn(@NonNull UUID isbn) throws BookNotFoundException {
         return bookRepository.findByIsbn(isbn)
-            .map(BookService::toBookDto);
+            .map(this::toBookDto);
             //.(Mono.just(new BookNotFoundException(isbn.toString()));
     }
 
-    @Cacheable(key = "{#author, #title, #pageable}")
+    @Cacheable(key = "{#author, #title}")
     public Flux<BookDto> getBooks(String author, String title, Pageable pageable) {
+        Flux<BookModel> booksFlux;
+
         if (StringUtils.isNotBlank(author) && StringUtils.isNotBlank(title)) {
-            return bookRepository.findByAuthorAndTitle(author, title, pageable)
-                    //.stream()
-                    .map(BookService::toBookDto);
-                    //.toList());
+            booksFlux = bookRepository.findByAuthorContainingIgnoreCaseAndTitleContainingIgnoreCase(author, title, pageable);
         } else if (StringUtils.isNotBlank(author) && StringUtils.isBlank(title)) {
-            return bookRepository.findByAuthor(author, pageable)
-                    //.stream()
-                    .map(BookService::toBookDto);
+            booksFlux = bookRepository.findByAuthorContainingIgnoreCase(author, pageable);
         } else if (StringUtils.isNotBlank(title) && StringUtils.isBlank(author)) {
-            return bookRepository.findByTitle(title, pageable)
-                    //.stream()
-                    .map(BookService::toBookDto);
-                    //.toList());
+            booksFlux = bookRepository.findByTitleContainingIgnoreCase(title, pageable);
+        } else {
+            booksFlux = bookRepository.findAllBy(pageable);
         }
 
-        return bookRepository.findAllBy(pageable).map(BookService::toBookDto);
+        return booksFlux.map(this::toBookDto);
     }
 
-    public UUID updateBook(BookDto bookDto) {
-        if (Boolean.TRUE.equals(bookRepository.findByIsbn(bookDto.getIsbn()).hasElement().block())) {
-            var bookModel = toBookModel(bookDto);
-            var savedBook = bookRepository.save(bookModel).block();
-            return savedBook.getIsbn();
-        }
-
-        throw new BookNotFoundException(bookDto.getIsbn().toString());
+    public Mono<UUID> updateBook(BookDto bookDto) {
+        return bookRepository.findByIsbn(bookDto.getIsbn())
+                .flatMap(existingBook -> {
+                    var bookModel = toBookModel(bookDto);
+                    bookModel.setNewBook(false);
+                    return bookRepository.save(bookModel).map(BookModel::getIsbn);
+                })
+                .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN", bookDto.getIsbn().toString())));
     }
 
-    private static Books toBookModel(BookDto bookDto) {
-        return Books.builder()
+    private BookModel toBookModel(BookDto bookDto) {
+        return BookModel.builder()
             .isbn(bookDto.getIsbn())
             .author(bookDto.getAuthor())
             .title(bookDto.getTitle())
@@ -89,12 +86,12 @@ public class BookService {
             .build();
     }
 
-    private static BookDto toBookDto(Books books) {
+    private BookDto toBookDto(BookModel bookModel) {
         return BookDto.builder()
-            .isbn(books.getIsbn())
-            .author(books.getAuthor())
-            .title(books.getTitle())
-            .price(books.getPrice())
+            .isbn(bookModel.getIsbn())
+            .author(bookModel.getAuthor())
+            .title(bookModel.getTitle())
+            .price(bookModel.getPrice())
             .build();
     }
 }

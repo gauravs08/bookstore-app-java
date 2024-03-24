@@ -1,7 +1,9 @@
 package fi.epassi.recruitment.api;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -25,15 +27,17 @@ public class ApiResponsePage<T> extends ApiResponse<List<T>> {
     }
 
 
-    public static <T> ApiResponsePage<T> okWithPagination(Flux<T> flux, long totalElements, int totalPages, int currentPage, int pageSize) {
-        return new ApiResponsePage<>(
-                OK.value(),
-                OK.getReasonPhrase(),
-                flux.collectList().block(), // Collect all elements into a list
-                totalElements,
-                totalPages,
-                currentPage,
-                pageSize
+    public static <T> Mono<ApiResponsePage<T>> okWithPagination(Flux<T> flux, long totalElements, int totalPages, int currentPage, int pageSize) {
+        return flux.collectList().map(list ->
+                new ApiResponsePage<>(
+                        HttpStatus.OK.value(),
+                        HttpStatus.OK.getReasonPhrase(),
+                        list,
+                        totalElements,
+                        totalPages,
+                        currentPage,
+                        pageSize
+                )
         );
     }
 

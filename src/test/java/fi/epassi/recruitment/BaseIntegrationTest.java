@@ -13,7 +13,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+//@Transactional
 @Rollback
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = RANDOM_PORT)

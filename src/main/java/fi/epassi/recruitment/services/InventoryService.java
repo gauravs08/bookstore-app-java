@@ -1,6 +1,6 @@
 package fi.epassi.recruitment.services;
 
-import fi.epassi.recruitment.model.Books;
+import fi.epassi.recruitment.model.BookModel;
 import fi.epassi.recruitment.model.Inventory;
 import fi.epassi.recruitment.repository.BookRepository;
 import fi.epassi.recruitment.exception.InventoryNotFoundException;
@@ -22,13 +22,18 @@ import java.util.UUID;
 @CacheConfig(cacheNames = "inventoryCache")
 public class InventoryService {
 
+
     private final BookRepository bookRepository;
 
     private final InventoryRepository inventoryRepository;
-
+//    @Autowired
+//    public InventoryService(BookRepository bookRepository, InventoryRepository inventoryRepository){
+//        this.bookRepository=bookRepository;
+//        this.inventoryRepository=inventoryRepository;
+//    }
     @Cacheable(key = "{#author}")
     public Mono<InventoryDto> getCopiesByAuthor(String author) {
-        Flux<Books> books = bookRepository.findByAuthor(author, Pageable.ofSize(1));
+        Flux<BookModel> books = bookRepository.findByAuthorContainingIgnoreCase(author, Pageable.ofSize(1));
 
         return books.flatMap(book -> inventoryRepository.findByIsbn(book.getIsbn())
                         .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", book.getIsbn().toString()))))
@@ -49,7 +54,7 @@ public class InventoryService {
     // Get copies by title
     @Cacheable(key = "{#title}")
     public Mono<InventoryDto> getCopiesByTitle(String title) {
-        Flux<Books> books = bookRepository.findByTitle(title, Pageable.ofSize(1));
+        Flux<BookModel> books = bookRepository.findByTitleContainingIgnoreCase(title, Pageable.ofSize(1));
         return books.flatMap(book -> inventoryRepository.findByIsbn(book.getIsbn())
                         .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", book.getIsbn().toString()))))
                 .reduce(0, (totalCopies, inventory) -> totalCopies + inventory.getCopies())
@@ -69,45 +74,25 @@ public class InventoryService {
     @Cacheable(key = "{#isbn}")
     public Mono<InventoryDto> getCopiesByIsbn(UUID isbn) {
         return inventoryRepository.findByIsbn(isbn)
-                .map(InventoryService::toInventoryDto)
+                .map(this::toInventoryDto)
                 .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", isbn.toString())));
                 //.orElseThrow(() -> new InventoryNotFoundException(isbn.toString()));
 
         //return inventory.getCopies();
     }
 
-    public Mono<UUID> updateInventory(InventoryDto inventoryDto) {
-        return bookRepository.findByIsbn(inventoryDto.getIsbn())
-                .hasElement()
-                .flatMap(found -> {
-                    if (found) {
-                        var inventoryModel = toInventoryModel(inventoryDto);
-                        return inventoryRepository.save(inventoryModel)
-                                .map(Inventory::getIsbn);
-                    } else {
-                        return Mono.error(new InventoryNotFoundException("ISBN", inventoryDto.getIsbn().toString()));
-                    }
-                });
-//        if (Boolean.TRUE.equals(bookRepository.findByIsbn(inventoryDto.getIsbn()).hasElement().block())) {
-//            var inventoryModel = toInventoryModel(inventoryDto);
-//            var savedBook = inventoryRepository.save(inventoryModel).block();
-//            return savedBook.getIsbn();
-//        }
-//        throw new InventoryNotFoundException(inventoryDto.getIsbn().toString());
+    public Mono<UUID> updateInventory(UUID isbn, Integer copies) {
+        return inventoryRepository.findByIsbn(isbn)
+                .flatMap(inventory -> {
+                    int updatedCopies = inventory.getCopies() + copies;
+                    inventory.setCopies(updatedCopies);
+                    inventory.setNewInventory(false);
+                    return inventoryRepository.save(inventory).map(Inventory::getIsbn);
+                })
+                .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", isbn.toString())));
     }
 
-//    public UUID updateInventory(BookModel bookModel) {
-//        if (Boolean.TRUE.equals(inventoryRepository.findByIsbn(bookModel.getIsbn()).hasElement().block())) {
-//            InventoryModel inventoryModel = InventoryModel.builder()
-//                    .isbn(bookModel.getIsbn())
-//                    .copies(1)
-//                    .build();
-//            var savedBook = inventoryRepository.save(inventoryModel).block();
-//            return savedBook.getIsbn();
-//        }
-//
-//        throw new InventoryNotFoundException(bookModel.getIsbn().toString());
-//    }
+
 
     // Save or update inventory copies
     public Mono<Void> saveOrUpdateInventory(UUID isbn, int copies) {
@@ -119,28 +104,11 @@ public class InventoryService {
                 })
                 .switchIfEmpty(Mono.defer(() -> {
                     // Create new inventory if not found
-                    Inventory newInventory = new Inventory(isbn, 1);
+                    Inventory newInventory = new Inventory(isbn, 1,true);
                     return inventoryRepository.save(newInventory);
                 }))
                 .then();
-//        try {
-//            // Check if inventory entry exists for the given ISBN
-//            Mono<InventoryModel> existingInventory = inventoryRepository.findByIsbn(isbn);
-//            if (Boolean.TRUE.equals(existingInventory.hasElement().block())) {
-//                InventoryModel updatedinventoryModel = existingInventory.block();
-//                // If inventory entry exists, update the copies by 1
-//                updatedinventoryModel.setCopies(updatedinventoryModel.getCopies() + 1);
-//                inventoryRepository.save(updatedinventoryModel);
-//            } else {
-//                // If inventory entry does not exist, create a new entry
-//                InventoryModel newInventory = InventoryModel.builder()
-//                        .isbn(isbn)
-//                        .copies(copies).build();
-//                inventoryRepository.save(newInventory);
-//            }
-//        } catch(Exception e) {
-//          throw new InventoryUpdateException(isbn.toString());
-//        }
+
     }
 
     public Mono<InventoryGlobalDto> getTotalCopies() {
@@ -151,14 +119,14 @@ public class InventoryService {
                         .total_copies(totalCopies)
                         .build());
     }
-    private static Inventory toInventoryModel(InventoryDto inventoryDto) {
+    private Inventory toInventoryModel(InventoryDto inventoryDto) {
         return Inventory.builder()
                 .isbn(inventoryDto.getIsbn())
                 .copies(inventoryDto.getCopies())
                 .build();
     }
 
-        private static InventoryDto toInventoryDto(Inventory inventory) {
+    private InventoryDto toInventoryDto(Inventory inventory) {
         return InventoryDto.builder()
                 .isbn(inventory.getIsbn())
                 .copies(inventory.getCopies())
