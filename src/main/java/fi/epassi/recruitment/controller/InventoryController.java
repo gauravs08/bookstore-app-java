@@ -1,10 +1,9 @@
 package fi.epassi.recruitment.controller;
 
 import fi.epassi.recruitment.api.ApiResponse;
-import fi.epassi.recruitment.dto.BookDto;
-import fi.epassi.recruitment.exception.InventoryNotFoundException;
 import fi.epassi.recruitment.dto.InventoryDto;
 import fi.epassi.recruitment.dto.InventoryGlobalDto;
+import fi.epassi.recruitment.exception.InventoryNotFoundException;
 import fi.epassi.recruitment.services.InventoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -7,8 +7,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.OK;
-
 @Getter
 public class ApiResponsePage<T> extends ApiResponse<List<T>> {
 

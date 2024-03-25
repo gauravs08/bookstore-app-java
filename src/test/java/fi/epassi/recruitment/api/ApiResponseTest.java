@@ -1,9 +1,9 @@
 package fi.epassi.recruitment.api;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-
-import org.junit.jupiter.api.Test;
 
 class ApiResponseTest {
 

@@ -1,14 +1,11 @@
 package fi.epassi.recruitment.exception;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
-import org.junit.jupiter.api.Test;
+import static org.springframework.http.HttpStatus.*;
 
 class ApplicationExceptionTest {
 

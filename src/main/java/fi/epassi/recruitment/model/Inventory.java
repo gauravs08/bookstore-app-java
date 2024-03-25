@@ -1,9 +1,12 @@
 package fi.epassi.recruitment.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -26,6 +29,9 @@ public class Inventory implements Persistable {
     private UUID isbn;
 
     private int copies;
+
+    @Column("bookstore_id") // Foreign key column
+    private Long bookstoreId; // Foreign key referencing Bookstore
 
     //TODO
     // -- there is an ongoing issue and trying to by-pass the failure as one of the work around

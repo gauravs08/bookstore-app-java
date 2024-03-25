@@ -1,12 +1,9 @@
 package fi.epassi.recruitment.services;
 
-import fi.epassi.recruitment.model.BookModel;
 import fi.epassi.recruitment.dto.BookDto;
-import fi.epassi.recruitment.repository.BookRepository;
 import fi.epassi.recruitment.exception.BookNotFoundException;
-
-import java.util.UUID;
-
+import fi.epassi.recruitment.model.BookModel;
+import fi.epassi.recruitment.repository.BookRepository;
 import fi.epassi.recruitment.repository.InventoryRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

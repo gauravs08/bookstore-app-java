@@ -1,11 +1,11 @@
 package fi.epassi.recruitment.services;
 
+import fi.epassi.recruitment.dto.InventoryDto;
+import fi.epassi.recruitment.dto.InventoryGlobalDto;
+import fi.epassi.recruitment.exception.InventoryNotFoundException;
 import fi.epassi.recruitment.model.BookModel;
 import fi.epassi.recruitment.model.Inventory;
 import fi.epassi.recruitment.repository.BookRepository;
-import fi.epassi.recruitment.exception.InventoryNotFoundException;
-import fi.epassi.recruitment.dto.InventoryDto;
-import fi.epassi.recruitment.dto.InventoryGlobalDto;
 import fi.epassi.recruitment.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;

@@ -73,6 +73,7 @@ dependencies {
     // -- Tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'io.projectreactor:reactor-test:3.1.0.RELEASE'
 
     // -- Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'

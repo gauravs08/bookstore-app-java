@@ -1,11 +1,6 @@
 package fi.epassi.recruitment.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
 import fi.epassi.recruitment.api.ApiResponse;
-
-import java.util.UUID;
-
 import fi.epassi.recruitment.api.ApiResponsePage;
 import fi.epassi.recruitment.dto.BookDto;
 import fi.epassi.recruitment.exception.BookNotFoundException;
@@ -16,23 +11,19 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/v1/books")//, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/api/v1/books")
 public class BookController {
 
     private final BookService bookService;
@@ -53,13 +44,6 @@ public class BookController {
                 return ApiResponsePage.okWithPagination(bookFlux, totalElements, totalPages, page, size);
             }
         });
-//             return bookFlux.count()
-//                .map(totalElements -> {
-//                    int totalPages = (int) Math.ceil((double) totalElements / size);
-//                    return ApiResponsePage.okWithPagination(bookFlux, totalElements, totalPages, page, size);
-//                })
-//                .flux()
-//                .switchIfEmpty(Mono.error(new BookNotFoundException()));
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
