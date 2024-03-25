@@ -17,5 +17,8 @@ FOREIGN KEY (bookstore_id) REFERENCES bookstore(id);
 INSERT INTO bookstore (id, name, address,created_at) VALUES (1001,'Odin Book Oy', 'Helsinki', current_timestamp);
 INSERT INTO bookstore (id, name, address,created_at) VALUES (1002,'Helmet Book Oy', 'Kallio', current_timestamp);
 
-UPDATE inventory SET bookstore_id = 1001 where ISBN='3fa85f64-5717-4562-b3fc-2c963f66afa9';
-UPDATE inventory SET bookstore_id = 1002 where ISBN='3fa85f64-5717-4562-b3fc-2c963f66afa1';
+UPDATE inventory SET bookstore_id = 1001 where ID='3fa85f64-5717-4562-b3fc-2c963f66afa9';
+UPDATE inventory SET bookstore_id = 1002 where ID='3fa85f64-5717-4562-b3fc-2c963f66afa1';
+UPDATE inventory SET bookstore_id = 1002 where ID='3fa85f64-5717-4562-b3fc-2c963f66afa2';
+UPDATE inventory SET bookstore_id = 1002 where ID='3fa85f64-5717-4562-b3fc-2c963f66afa3';
+UPDATE inventory SET bookstore_id = 1002 where ID='3fa85f64-5717-4562-b3fc-2c963f66afa4';

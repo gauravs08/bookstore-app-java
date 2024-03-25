@@ -94,23 +94,6 @@ public class InventoryService {
 
 
 
-    // Save or update inventory copies
-    public Mono<Void> saveOrUpdateInventory(UUID isbn, int copies) {
-        return inventoryRepository.findByIsbn(isbn)
-                .flatMap(inventory -> {
-                    // Increment copies if inventory exists
-                    inventory.setCopies(inventory.getCopies() + 1);
-                    return inventoryRepository.save(inventory);
-                })
-                .switchIfEmpty(Mono.defer(() -> {
-                    // Create new inventory if not found
-                    Inventory newInventory = new Inventory(isbn, 1,true);
-                    return inventoryRepository.save(newInventory);
-                }))
-                .then();
-
-    }
-
     public Mono<InventoryGlobalDto> getTotalCopies() {
         return inventoryRepository.findAll()
                 .map(Inventory::getCopies)
@@ -118,12 +101,6 @@ public class InventoryService {
                 .map(totalCopies -> InventoryGlobalDto.builder()
                         .total_copies(totalCopies)
                         .build());
-    }
-    private Inventory toInventoryModel(InventoryDto inventoryDto) {
-        return Inventory.builder()
-                .isbn(inventoryDto.getIsbn())
-                .copies(inventoryDto.getCopies())
-                .build();
     }
 
     private InventoryDto toInventoryDto(Inventory inventory) {
