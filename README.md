@@ -16,7 +16,7 @@ The Bookstore is not yet open, as we're still working on the technical side of t
 
 For now, we're in the phase where we have very limited functionality, and we still need to deliver a few more things for the grand opening.
 
-At this stage, we're able to create, update, read & delete bookModel in our global inventory.\
+At this stage, we're able to create, update, read & delete books in our global inventory.\
 Worth mentioning: in order to simplify some parts of project, we're using UUID as ISBN (International Standard Book Number).
 
 ## Technical information
@@ -91,13 +91,13 @@ Available REST API methods:
 curl -X GET 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json'
 ```
 
-2. Get books by ISBN: `GET /api/v1/books/{isbn}`, responds with body of `BookDto`.
+2. Get book by ISBN: `GET /api/v1/books/{isbn}`, responds with body of `BookDto`.
 
 ```bash
 curl -X GET 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json' 
 ```
 
-3. Create a books: `POST /api/v1/books`, responds with body of ISBN string.
+3. Create a book: `POST /api/v1/book`, responds with body of ISBN string.
 
 ```bash
 curl -X POST 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json' --data-raw '{
@@ -108,7 +108,7 @@ curl -X POST 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/
 }'
 ```
 
-4. Update a books: `PUT /api/v1/books`, responds with body of ISBN string.
+4. Update a book: `PUT /api/v1/book`, responds with body of ISBN string.
 
 ```bash
 curl -X PUT 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json' --data-raw '{
@@ -119,7 +119,7 @@ curl -X PUT 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/j
 }'
 ```
 
-5. Delete a books by ISBN: `DELETE /api/v1/books/{isbn}`, responds without body, response status 200 OK.
+5. Delete a book by ISBN: `DELETE /api/v1/books/{isbn}`, responds without body, response status 200 OK.
 
 ```bash
 curl -X DELETE 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json'
@@ -161,19 +161,19 @@ Before working on the tasks, make sure, that you have initialized fresh git repo
 
 - **Backstory**:\
   We have some time before the grand opening of the Bookstore, and we are still missing the most important feature.\
-  We do not have the possibility to know how many books we have available to sell (how many books copies we have in the Inventory).
+  We do not have the possibility to know how many books we have available to sell (how many book copies we have in the Inventory).
 
 
 - **Assigment description**:\
   You need to add the possibility to store information about how many books we have in our global inventory.\
   Also, when introducing such feature, we should have an API with capabilities of:
-    - Returning number of books copies that we have in Inventory by ISBN.
-    - Returning number of books copies that we have in Inventory by Author.
-    - Returning number of books copies that we have in Inventory by Title.
-    - Updating number of books copies that we have in the Bookstore Inventory.
+    - Returning number of book copies that we have in Inventory by ISBN.
+    - Returning number of book copies that we have in Inventory by Author.
+    - Returning number of book copies that we have in Inventory by Title.
+    - Updating number of book copies that we have in the Bookstore Inventory.
 
-  Note, that the endpoint for managing books entities should not be changed.\
-  The books availability (number of copies) should be separate information, available via separate API.
+  Note, that the endpoint for managing book entities should not be changed.\
+  The book availability (number of copies) should be separate information, available via separate API.
 
 ### Task #2 - First issues & technical debt impact
 
