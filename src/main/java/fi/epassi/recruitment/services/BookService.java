@@ -51,7 +51,7 @@ public class BookService {
         //.(Mono.just(new BookNotFoundException(isbn.toString()));
     }
 
-    @Cacheable(key = "{#author, #title}")
+    @Cacheable(key = "{#author, #title, #pageable}")
     public Mono<ApiResponsePage<BookDto>> getBooks(String author, String title, Pageable pageable) {
         Flux<BookModel> booksFlux;
 
@@ -72,17 +72,6 @@ public class BookService {
                     return new ApiResponsePage<>(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), books, totalBooks, totalPages, pageable.getPageNumber(), pageable.getPageSize());
                 });
     }
-//
-//    public Mono<ApiResponsePage<BookDto>> getAllBooks(int page, int size) {
-//        return bookRepository.findAllBy(PageRequest.of(page, size))
-//                .map(this::toBookDto)
-//                .collectList()
-//                .map(books -> {
-//                    long totalBooks = books.size(); // Assuming no separate count query
-//                    int totalPages = (int) Math.ceil((double) totalBooks / size);
-//                    return new ApiResponsePage<>(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), books, totalBooks, totalPages, page, size);
-//                });
-//    }
 
     public Mono<UUID> updateBook(BookDto bookDto) {
         return bookRepository.findByIsbn(bookDto.getIsbn())
