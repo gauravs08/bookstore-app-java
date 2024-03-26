@@ -39,8 +39,4 @@ public class ApiResponsePage<T> extends ApiResponse<List<T>> {
         );
     }
 
-    public static <T> ApiResponsePage<T> error(int statusCode, String statusMessage) {
-        return new ApiResponsePage<>(statusCode, statusMessage, null, 0, 0, 0, 0);
-    }
-
 }

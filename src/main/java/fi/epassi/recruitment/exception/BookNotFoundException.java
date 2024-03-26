@@ -9,6 +9,7 @@ public class BookNotFoundException extends ApplicationException {
     }
 
     public BookNotFoundException() {
-        super(NOT_FOUND, "No books in store");
+        super(NOT_FOUND, "No books in store with the given data");
     }
+
 }

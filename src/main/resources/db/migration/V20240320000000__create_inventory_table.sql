@@ -1,6 +1,7 @@
 CREATE TABLE `inventory`
 (
-    `id`     varchar(36)    NOT NULL,
-    `copies` integer    NOT NULL,
+    `id`     VARCHAR(36) NOT NULL,
+    --`isbn`   VARCHAR(36) NOT NULL,
+    `copies` INTEGER     NOT NULL default 0,
     PRIMARY KEY (`id`)
-) ;
+);

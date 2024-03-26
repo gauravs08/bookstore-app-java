@@ -38,4 +38,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> buildResponse(HttpStatus status, String message, T responseObject) {
         return new ApiResponse<>(status.value(), message, responseObject);
     }
+    public static <T> ApiResponse<T> error(int statusCode, String statusMessage) {
+        return new ApiResponse<>(statusCode, statusMessage, null);
+    }
 }

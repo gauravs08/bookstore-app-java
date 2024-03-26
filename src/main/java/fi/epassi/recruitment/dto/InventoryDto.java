@@ -17,5 +17,6 @@ public class InventoryDto {
     private String title;
     private String author;
     private int copies;
+    private Long bookstore_id;
 
 }

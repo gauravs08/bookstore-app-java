@@ -32,7 +32,7 @@ public class BookService {
 //    }
     public Mono<UUID> createBook(BookDto bookDto) {
         BookModel bookModel = toBookModel(bookDto);
-        bookModel.setAsNew();
+        //bookModel.setAsNew();
         return bookRepository.save(bookModel)
                 .map(BookModel::getIsbn);
     }
@@ -70,7 +70,7 @@ public class BookService {
         return bookRepository.findByIsbn(bookDto.getIsbn())
                 .flatMap(existingBook -> {
                     var bookModel = toBookModel(bookDto);
-                    bookModel.setNewBook(false);
+                    //bookModel.setNewBook(false);
                     return bookRepository.save(bookModel).map(BookModel::getIsbn);
                 })
                 .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN", bookDto.getIsbn().toString())));

@@ -125,6 +125,37 @@ curl -X PUT 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/j
 curl -X DELETE 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json'
 ```
 
+6. Inventory for a book by ISBN `GET /api/v1/inventory/isbn/{isbn}/copies`, responds with body of inventory, response status 200 OK.
+```bash
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/inventory/isbn/3fa85f64-5717-4562-b3fc-2c963f66afa9/copies' \
+  -H 'accept: application/json'
+```
+7. Update Inventory for a book by ISBN `UPDATE /api/v1/inventory/isbn/{isbn}/copies`, responds with body of inventory, response status 200 OK.
+```bash
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/inventory/isbn/3fa85f64-5717-4562-b3fc-2c963f66afa9/copies' \
+  -H 'accept: application/json'
+```
+8. Inventory for a book by AUTHOR `GET /api/v1/inventory/author/{author}/copies`, responds with body of inventory, response status 200 OK.
+```bash
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/inventory/author/Author1/copies' \
+  -H 'accept: application/json'
+```
+9. Inventory for a book by TITLE `GET /api/v1/inventory/author/{title}/copies`, responds with body of inventory, response status 200 OK.
+```bash
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/inventory/title/Title1/copies' \
+  -H 'accept: application/json'
+```
+10. Inventory for all book `GET /api/v1/inventory/copies`, responds with body of inventory, response status 200 OK.
+```bash
+curl -X 'GET' \
+  'http://localhost:8080/api/v1/inventory/copies' \
+  -H 'accept: application/json'
+```
+
 We are using [BookDto](src/main/java/fi/epassi/recruitment/dto/BookDto.java) in the communication,
 and [BookModel](src/main/java/fi/epassi/recruitment/model/BookModel.java) for storing Book information in the database.
 

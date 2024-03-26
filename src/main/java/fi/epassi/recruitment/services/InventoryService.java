@@ -2,19 +2,24 @@ package fi.epassi.recruitment.services;
 
 import fi.epassi.recruitment.dto.InventoryDto;
 import fi.epassi.recruitment.dto.InventoryGlobalDto;
+import fi.epassi.recruitment.exception.BookstoreNotFoundException;
 import fi.epassi.recruitment.exception.InventoryNotFoundException;
 import fi.epassi.recruitment.model.BookModel;
 import fi.epassi.recruitment.model.Inventory;
 import fi.epassi.recruitment.repository.BookRepository;
+import fi.epassi.recruitment.repository.BookstoreRepository;
 import fi.epassi.recruitment.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -26,72 +31,56 @@ public class InventoryService {
     private final BookRepository bookRepository;
 
     private final InventoryRepository inventoryRepository;
-//    @Autowired
-//    public InventoryService(BookRepository bookRepository, InventoryRepository inventoryRepository){
-//        this.bookRepository=bookRepository;
-//        this.inventoryRepository=inventoryRepository;
-//    }
-    @Cacheable(key = "{#author}")
-    public Mono<InventoryDto> getCopiesByAuthor(String author) {
-        Flux<BookModel> books = bookRepository.findByAuthorContainingIgnoreCase(author, Pageable.ofSize(1));
+    private final BookstoreRepository bookstoreRepository;
 
-        return books.flatMap(book -> inventoryRepository.findByIsbn(book.getIsbn())
-                        .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", book.getIsbn().toString()))))
-                .reduce(0, (totalCopies, inventory) -> totalCopies + inventory.getCopies())
-                .map(totalCopies -> InventoryDto.builder().author(author).copies(totalCopies).build());
-
-//        int totalCopies = 0;
-//        for (BookModel book : books) {
-//            InventoryModel inventory = inventoryRepository.findByIsbn(book.getIsbn())
-//                    .orElseThrow(() -> new InventoryNotFoundException(book.getIsbn().toString()));
-//            totalCopies += inventory.getCopies();
-//        }
-//        return InventoryDto.builder().author(author)
-//                .copies(totalCopies)
-//                .build();
+    @Cacheable(cacheNames = "copiesByAuthor",key = "{#author}")
+    public Mono<Map<String, Integer>> getCopiesByAuthorBookstore(String author) {
+        Flux<BookModel> books = bookRepository.findByAuthorContainingIgnoreCase(author, Pageable.ofSize(20));
+        return getCopiesMapByBookStoreId(books);
     }
 
-    // Get copies by title
-    @Cacheable(key = "{#title}")
-    public Mono<InventoryDto> getCopiesByTitle(String title) {
-        Flux<BookModel> books = bookRepository.findByTitleContainingIgnoreCase(title, Pageable.ofSize(1));
-        return books.flatMap(book -> inventoryRepository.findByIsbn(book.getIsbn())
-                        .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", book.getIsbn().toString()))))
-                .reduce(0, (totalCopies, inventory) -> totalCopies + inventory.getCopies())
-                .map(totalCopies -> InventoryDto.builder().author(title).copies(totalCopies).build());
-//        int totalCopies = 0;
-//        for (BookModel book : books) {
-//            InventoryModel inventory = inventoryRepository.findByIsbn(book.getIsbn())
-//                    .orElseThrow(() -> new InventoryNotFoundException(book.getIsbn().toString()));
-//            totalCopies += inventory.getCopies();
-//        }
-//        return InventoryDto.builder().title(title)
-//                .copies(totalCopies)
-//                .build();
+    @Cacheable(cacheNames = "copiesByTitle", key = "{#title}")
+    public Mono<Map<String, Integer>> getCopiesByTitleBookstore(String title) {
+        Flux<BookModel> books = bookRepository.findByTitleContainingIgnoreCase(title, Pageable.ofSize(20));
+        return getCopiesMapByBookStoreId(books);
     }
 
-    // Get copies by ISBN
-    @Cacheable(key = "{#isbn}")
-    public Mono<InventoryDto> getCopiesByIsbn(UUID isbn) {
+    private Mono<Map<String, Integer>> getCopiesMapByBookStoreId(Flux<BookModel> books) {
+        return books.flatMap(book -> {
+                    return inventoryRepository.findByIsbn(book.getIsbn())
+                            .flatMap(inventory -> {
+                                Long bookstoreId = inventory.getBookstoreId();
+                                int copies = inventory.getCopies();
+                                Map<Long, Integer> map = new HashMap<>();
+                                map.put(bookstoreId, copies);
+                                return Mono.just(map);
+                            });
+                })
+                .reduce(new HashMap<>(), (map1, map2) -> {
+                    map2.forEach((bookstoreId, copies) -> map1.merge(String.valueOf(bookstoreId), copies, Integer::sum));
+                    return map1;
+                });
+    }
+
+    @Cacheable(cacheNames = "copiesByIsbn",key = "{#isbn}")
+    public Flux<InventoryDto> getCopiesByIsbn(UUID isbn) {
         return inventoryRepository.findByIsbn(isbn)
                 .map(this::toInventoryDto)
                 .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", isbn.toString())));
-                //.orElseThrow(() -> new InventoryNotFoundException(isbn.toString()));
-
-        //return inventory.getCopies();
     }
 
-    public Mono<UUID> updateInventory(UUID isbn, Integer copies) {
-        return inventoryRepository.findByIsbn(isbn)
+    @CacheEvict(cacheNames = {"copiesByIsbn", "copiesByTitle","copiesByAuthor"}, allEntries = true)
+    public Mono<UUID> updateInventory(UUID isbn, Integer copies, Long bookstore_id) {
+        return inventoryRepository.findByIsbnAndBookstoreId(isbn, bookstore_id)
                 .flatMap(inventory -> {
-                    int updatedCopies = inventory.getCopies() + copies;
-                    inventory.setCopies(updatedCopies);
-                    inventory.setNewInventory(false);
+                    //int updatedCopies = inventory.getCopies() + copies;
+                    inventory.setCopies(copies);
+                    inventory.setBookstoreId(bookstore_id);
+                    //inventory.setNewInventory(false);
                     return inventoryRepository.save(inventory).map(Inventory::getIsbn);
                 })
-                .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", isbn.toString())));
+                .switchIfEmpty(createNewInventory(isbn, copies, bookstore_id));
     }
-
 
 
     public Mono<InventoryGlobalDto> getTotalCopies() {
@@ -107,6 +96,23 @@ public class InventoryService {
         return InventoryDto.builder()
                 .isbn(inventory.getIsbn())
                 .copies(inventory.getCopies())
+                .bookstore_id(inventory.getBookstoreId())
                 .build();
+    }
+
+    private Mono<UUID> createNewInventory(UUID isbn, Integer copies, Long bookstoreId) {
+        return bookstoreRepository.existsById(bookstoreId)
+                .flatMap(exists -> {
+                    if (exists) {
+                        Inventory newInventory = new Inventory();
+                        newInventory.setIsbn(isbn);
+                        newInventory.setCopies(copies);
+                        newInventory.setBookstoreId(bookstoreId);
+                        //newInventory.setNewInventory(true);
+                        return inventoryRepository.save(newInventory).map(Inventory::getIsbn);
+                    } else {
+                        return Mono.error(new BookstoreNotFoundException("Bookstore with ID " + bookstoreId + " not found."));
+                    }
+                });
     }
 }
