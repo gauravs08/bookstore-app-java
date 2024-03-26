@@ -9,12 +9,9 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
 @SpringBootApplication
 @EnableConfigurationProperties
-//@EnableJpaAuditing
 @EnableCaching
 @EnableR2dbcRepositories
-//@EntityScan
 @EnableR2dbcAuditing
-//@ComponentScan(basePackages = {"fi.epassi.recruitment.repository","fi.epassi.recruitment"})
 public class RecruitmentApplication {
 
     public static void main(String[] args) {

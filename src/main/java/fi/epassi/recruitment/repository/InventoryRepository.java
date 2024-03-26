@@ -10,8 +10,8 @@ import java.util.UUID;
 
 @Repository
 public interface InventoryRepository extends ReactiveCrudRepository<Inventory, UUID> {
-
     Flux<Inventory> findByIsbn(UUID isbn);
+
     Mono<Inventory> findByIsbnAndBookstoreId(UUID isbn, Long bookstore_id);
 
 }

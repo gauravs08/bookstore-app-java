@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -29,21 +28,12 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    Flux<ApiResponsePage<BookDto>> getBooks(
-        @RequestParam(value = "author", required = false) String author,
-        @RequestParam(value = "title", required = false) String title,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "20") int size) {
-        Flux<BookDto> bookFlux =  bookService.getBooks(author, title, PageRequest.of(page, size, Sort.unsorted()));
-        return bookFlux.collectList().flatMapMany(bookList -> {
-            long totalElements = bookList.size();
-            int totalPages = (int) Math.ceil((double) totalElements / size);
-            if (totalElements == 0) {
-                return Mono.error(new BookNotFoundException());
-            } else {
-                return ApiResponsePage.okWithPagination(bookFlux, totalElements, totalPages, page, size);
-            }
-        });
+    Mono<ApiResponsePage<BookDto>> getBooks(
+            @RequestParam(value = "author", required = false) String author,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return bookService.getBooks(author, title, PageRequest.of(page, size, Sort.unsorted()));
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
@@ -58,14 +48,14 @@ public class BookController {
                 .map(ApiResponse::ok);
     }
 
-    @GetMapping(value = "/{isbn}",produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{isbn}", produces = APPLICATION_JSON_VALUE)
     Mono<ApiResponse<BookDto>> getBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
-        //return ApiResponse.ok(bookService.getBookByIsbn(isbn));
         return bookService.getBookByIsbn(isbn)
                 .map(ApiResponse::ok)
-                .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN",isbn.toString())));
+                .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN", isbn.toString())));
 
     }
+
     @DeleteMapping(value = "/{isbn}")
     ApiResponse<Void> deleteBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
         try {

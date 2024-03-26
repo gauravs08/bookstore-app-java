@@ -30,7 +30,6 @@ public class InventoryController {
     @GetMapping(value = "/isbn/{isbn}/copies", produces = APPLICATION_JSON_VALUE)
     Flux<ApiResponse<InventoryDto>> getInventoryCopiesByIsbn(
             @PathVariable("isbn") @Validated UUID isbn) {
-        //return ApiResponse.ok(inventoryService.getCopiesByIsbn(isbn));
         return inventoryService.getCopiesByIsbn(isbn)
                 .map(ApiResponse::ok)
                 .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", isbn.toString())));
@@ -63,9 +62,9 @@ public class InventoryController {
                     if (e instanceof BookstoreNotFoundException) {
                         return (Mono.just(ApiResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage())));
                     } else if (e instanceof InventoryNotFoundException) {
-                        return ( Mono.just(ApiResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage())));
+                        return (Mono.just(ApiResponse.error(HttpStatus.NOT_FOUND.value(), e.getMessage())));
                     } else {
-                        log.error("Failed to update inventory:"+e.getMessage());
+                        log.error("Failed to update inventory:" + e.getMessage());
                         return (Mono.just(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred while updating inventory.")));
                     }
                 });

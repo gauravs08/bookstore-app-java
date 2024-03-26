@@ -7,6 +7,6 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface BookstoreRepository extends ReactiveCrudRepository<Inventory, Long> {
- Mono<Boolean> existsById(Long bookstoreId);
+    Mono<Boolean> existsById(Long bookstoreId);
 
 }

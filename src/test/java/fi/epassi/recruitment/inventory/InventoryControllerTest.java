@@ -36,7 +36,7 @@ class InventoryControllerTest extends BaseIntegrationTest {
     @Test
     void shouldGetInventoryCopiesByIsbn() throws Exception {
         // Given
-        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 10,false));
+        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 10, 1001L));
 
         // When
         ResultActions result = mvc.perform(get(BASE_PATH_V1_INVENTORY + "/isbn/{isbn}/copies", EXAMPLE_ISBN)
@@ -51,8 +51,8 @@ class InventoryControllerTest extends BaseIntegrationTest {
     @Test
     void shouldGetInventoryCopiesByAuthor() throws Exception {
         // Given
-        bookRepository.save(new BookModel(EXAMPLE_ISBN,EXAMPLE_TITLE,EXAMPLE_AUTHOR,new BigDecimal(15.0),true));
-        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 5,true)); // 5 copies for the example author
+        bookRepository.save(new BookModel(EXAMPLE_ISBN, EXAMPLE_TITLE, EXAMPLE_AUTHOR, new BigDecimal(15.0)));
+        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 5, 1001L)); // 5 copies for the example author
 
         // When
         ResultActions result = mvc.perform(get(BASE_PATH_V1_INVENTORY + "/author/{author}/copies", EXAMPLE_AUTHOR)
@@ -67,8 +67,8 @@ class InventoryControllerTest extends BaseIntegrationTest {
     @Test
     void shouldGetInventoryCopiesByTitle() throws Exception {
         // Given
-        bookRepository.save(new BookModel(EXAMPLE_ISBN,EXAMPLE_TITLE,EXAMPLE_AUTHOR,new BigDecimal(15.0),true));
-        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 7,true)); // 7 copies for the example title
+        bookRepository.save(new BookModel(EXAMPLE_ISBN, EXAMPLE_TITLE, EXAMPLE_AUTHOR, new BigDecimal(15.0)));
+        inventoryRepository.save(new Inventory(EXAMPLE_ISBN, 7, 100L)); // 7 copies for the example title
 
         // When
         ResultActions result = mvc.perform(get(BASE_PATH_V1_INVENTORY + "/title/{title}/copies", EXAMPLE_TITLE)

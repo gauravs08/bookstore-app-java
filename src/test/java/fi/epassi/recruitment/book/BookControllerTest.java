@@ -31,24 +31,20 @@ class BookControllerTest extends BaseIntegrationTest {
     private static final String AUTHOR = "author";
     private static final String TITLE = "title";
     private static final String BASE_PATH_V1_BOOK_BY_ISBN = BASE_PATH_V1_BOOK + "/{isbn}";
-
-    @Autowired
-    private ReactiveTransactionManager reactiveTransactionManager;
     private static final BookModel BOOK_MODEL_HOBBIT = BookModel.builder()
             .isbn(UUID.fromString("66737096-39ef-4a7c-aa4a-9fd018c14178"))
             .title("The Hobbit")
             .author("J.R.R Tolkien")
             .price(TEN)
-            .newBook(false)
             .build();
-
     private static final BookModel BOOK_MODEL_FELLOWSHIP = BookModel.builder()
             .isbn(UUID.fromString("556aa37d-ef9c-45d3-ba4a-a792c123208a"))
             .title("The Fellowship of the Rings")
             .author("J.R.R Tolkien")
-            .price(TEN).newBook(false)
+            .price(TEN)
             .build();
-
+    @Autowired
+    private ReactiveTransactionManager reactiveTransactionManager;
     @Autowired
     private BookRepository bookRepository;
 
@@ -83,11 +79,12 @@ class BookControllerTest extends BaseIntegrationTest {
     // Utility method to convert object to JSON string
     private String asJsonString(Object obj) throws Exception {
         var ret = new ObjectMapper().writeValueAsString(obj);
-        System.out.println("responseBody:"+ret);
+        System.out.println("responseBody:" + ret);
         return ret;
     }
+
     @Test
-    //@SneakyThrows
+        //@SneakyThrows
     void shouldCreateBookAndReturnId() throws JsonProcessingException {
         UUID EXAMPLE_UUID = UUID.randomUUID();
 
@@ -131,7 +128,8 @@ class BookControllerTest extends BaseIntegrationTest {
                         .getContentAsString()
         ).map(responseBody -> {
             try {
-                return objectMapper.readValue(responseBody, new TypeReference<ApiResponse<UUID>>(){});
+                return objectMapper.readValue(responseBody, new TypeReference<ApiResponse<UUID>>() {
+                });
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -144,11 +142,12 @@ class BookControllerTest extends BaseIntegrationTest {
         });
 
 
-    // Then
+        // Then
 //        response.andExpect(status().is2xxSuccessful())
 //            .andExpect(jsonPath("$.response", is(notNullValue())));
 
-}
+    }
+
     @Test
     @SneakyThrows
     void shouldRespondWithAllBooks() {
@@ -159,7 +158,7 @@ class BookControllerTest extends BaseIntegrationTest {
 
         // Then
         response.andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.response", is(notNullValue())));
+                .andExpect(jsonPath("$.response", is(notNullValue())));
     }
 
     @Test
@@ -176,8 +175,8 @@ class BookControllerTest extends BaseIntegrationTest {
 
         // Then
         response.andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.response[0].author", is("J.R.R Tolkien")))
-            .andExpect(jsonPath("$.response[0].title", is(notNullValue())));
+                .andExpect(jsonPath("$.response[0].author", is("J.R.R Tolkien")))
+                .andExpect(jsonPath("$.response[0].title", is(notNullValue())));
     }
 
     @Test
@@ -193,8 +192,8 @@ class BookControllerTest extends BaseIntegrationTest {
 
         // Then
         response.andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.response[0].author", is("J.R.R Tolkien")))
-            .andExpect(jsonPath("$.response[0].title", is("The Hobbit")));
+                .andExpect(jsonPath("$.response[0].author", is("J.R.R Tolkien")))
+                .andExpect(jsonPath("$.response[0].title", is("The Hobbit")));
     }
 
     @Test
@@ -207,7 +206,7 @@ class BookControllerTest extends BaseIntegrationTest {
 
         // Then
         response.andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.response", is(empty())));
+                .andExpect(jsonPath("$.response", is(empty())));
     }
 
     @Test
@@ -221,8 +220,8 @@ class BookControllerTest extends BaseIntegrationTest {
 
         // Then
         response.andExpect(status().is4xxClientError())
-            .andExpect(jsonPath("$.status", is(NOT_FOUND.value())))
-            .andExpect(jsonPath("$.title", is("Not Found")));
+                .andExpect(jsonPath("$.status", is(NOT_FOUND.value())))
+                .andExpect(jsonPath("$.title", is("Not Found")));
     }
 
     @Test
@@ -262,9 +261,9 @@ class BookControllerTest extends BaseIntegrationTest {
 
         // Then bad request since title is required.
         response.andExpect(status().is4xxClientError())
-            .andExpect(jsonPath("$.status", is(BAD_REQUEST.name())))
-            .andExpect(jsonPath("$.violations[0].field", is("title")))
-            .andExpect(jsonPath("$.violations[0].message", is("must not be blank")));
+                .andExpect(jsonPath("$.status", is(BAD_REQUEST.name())))
+                .andExpect(jsonPath("$.violations[0].field", is("title")))
+                .andExpect(jsonPath("$.violations[0].message", is("must not be blank")));
     }
 
     @Test
@@ -275,19 +274,19 @@ class BookControllerTest extends BaseIntegrationTest {
 
         // When
         var bookDto = BookDto.builder().isbn(saved.getIsbn())
-            .author("J.R.R Tolkien")
-            .title("The Return of the King")
-            .price(TEN)
-            .build();
+                .author("J.R.R Tolkien")
+                .title("The Return of the King")
+                .price(TEN)
+                .build();
         var bookDtoJson = mapper.writeValueAsString(bookDto);
 
         var response = mvc.perform(put(getEndpointUrl(BASE_PATH_V1_BOOK)).contentType(APPLICATION_JSON).content(bookDtoJson));
 
         var responseBody = response.andReturn().getResponse().getContentAsString();
-        System.out.println("responseBody------"+responseBody);
+        System.out.println("responseBody------" + responseBody);
         // Then
         response.andExpect(status().is2xxSuccessful())
-            .andExpect(jsonPath("$.status_code", is(OK.value())));
+                .andExpect(jsonPath("$.status_code", is(OK.value())));
     }
 
     @Test
@@ -295,10 +294,10 @@ class BookControllerTest extends BaseIntegrationTest {
     void shouldRespondWithNotFoundWhenUpdatingNonExistingBook() {
         // Given a random isbn that should not exist should result in a HTTP404
         var bookDto = BookDto.builder().isbn(UUID.randomUUID())
-            .author("J.R.R Tolkien")
-            .title("The Return of the King")
-            .price(TEN)
-            .build();
+                .author("J.R.R Tolkien")
+                .title("The Return of the King")
+                .price(TEN)
+                .build();
         var bookDtoJson = mapper.writeValueAsString(bookDto);
 
         // When
@@ -306,8 +305,8 @@ class BookControllerTest extends BaseIntegrationTest {
 
         // Then
         response.andExpect(status().is4xxClientError())
-            .andExpect(jsonPath("$.status", is(NOT_FOUND.value())))
-            .andExpect(jsonPath("$.title", is("Not Found")));
+                .andExpect(jsonPath("$.status", is(NOT_FOUND.value())))
+                .andExpect(jsonPath("$.title", is("Not Found")));
     }
 
 }

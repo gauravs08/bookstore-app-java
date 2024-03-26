@@ -26,14 +26,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "inventoryCache")
 public class InventoryService {
-
-
     private final BookRepository bookRepository;
-
     private final InventoryRepository inventoryRepository;
     private final BookstoreRepository bookstoreRepository;
 
-    @Cacheable(cacheNames = "copiesByAuthor",key = "{#author}")
+    @Cacheable(cacheNames = "copiesByAuthor", key = "{#author}")
     public Mono<Map<String, Integer>> getCopiesByAuthorBookstore(String author) {
         Flux<BookModel> books = bookRepository.findByAuthorContainingIgnoreCase(author, Pageable.ofSize(20));
         return getCopiesMapByBookStoreId(books);
@@ -62,14 +59,14 @@ public class InventoryService {
                 });
     }
 
-    @Cacheable(cacheNames = "copiesByIsbn",key = "{#isbn}")
+    @Cacheable(cacheNames = "copiesByIsbn", key = "{#isbn}")
     public Flux<InventoryDto> getCopiesByIsbn(UUID isbn) {
         return inventoryRepository.findByIsbn(isbn)
                 .map(this::toInventoryDto)
                 .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", isbn.toString())));
     }
 
-    @CacheEvict(cacheNames = {"copiesByIsbn", "copiesByTitle","copiesByAuthor"}, allEntries = true)
+    @CacheEvict(cacheNames = {"copiesByIsbn", "copiesByTitle", "copiesByAuthor"}, allEntries = true)
     public Mono<UUID> updateInventory(UUID isbn, Integer copies, Long bookstore_id) {
         return inventoryRepository.findByIsbnAndBookstoreId(isbn, bookstore_id)
                 .flatMap(inventory -> {
@@ -108,7 +105,6 @@ public class InventoryService {
                         newInventory.setIsbn(isbn);
                         newInventory.setCopies(copies);
                         newInventory.setBookstoreId(bookstoreId);
-                        //newInventory.setNewInventory(true);
                         return inventoryRepository.save(newInventory).map(Inventory::getIsbn);
                     } else {
                         return Mono.error(new BookstoreNotFoundException("Bookstore with ID " + bookstoreId + " not found."));

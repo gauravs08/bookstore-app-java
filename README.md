@@ -3,8 +3,10 @@
 ## General information
 
 - In this recruitment process, we would like to see how you think and what your approach is to the given problem.
-- We expect that you will write production-ready code with tests, where the project builds without issues and all tests are passing.
-- In each task, you will read some business backstory and rough description of the assigment, which should help you think in the right direction.
+- We expect that you will write production-ready code with tests, where the project builds without issues and all tests
+  are passing.
+- In each task, you will read some business backstory and rough description of the assigment, which should help you
+  think in the right direction.
 - For each task, please create separate branches, i.e., "task-1", "task-2", "task-3".
 - Tip: It would be best to base one task's branch on the previous one, creating somewhat a cascade of branches.
 - Extra note: Using AI tools is not allowed, as we want to see how you really think.
@@ -14,10 +16,12 @@
 Imagine that you are working in the R&D department of a Bookstore company.\
 The Bookstore is not yet open, as we're still working on the technical side of the business.
 
-For now, we're in the phase where we have very limited functionality, and we still need to deliver a few more things for the grand opening.
+For now, we're in the phase where we have very limited functionality, and we still need to deliver a few more things for
+the grand opening.
 
 At this stage, we're able to create, update, read & delete books in our global inventory.\
-Worth mentioning: in order to simplify some parts of project, we're using UUID as ISBN (International Standard Book Number).
+Worth mentioning: in order to simplify some parts of project, we're using UUID as ISBN (International Standard Book
+Number).
 
 ## Technical information
 
@@ -61,13 +65,16 @@ git commit -m "Initial commit"
 ### Packaging by feature
 
 As you can see, the application has been packaged by feature, instead of by layer.\
-We want to continue with such packaging, so make your changes are in specific packages (or create new one to avoid tightly-coupled entities).
+We want to continue with such packaging, so make your changes are in specific packages (or create new one to avoid
+tightly-coupled entities).
 
 ### Testing
 
-All tests are executed in parallel mode, thanks to [Junit Platform configuration](src/test/resources/junit-platform.properties).
+All tests are executed in parallel mode, thanks
+to [Junit Platform configuration](src/test/resources/junit-platform.properties).
 
-Note: tests are using the same database as the application in run mode, however, thanks to `@Transactional` and `@Rollback` annotations, the test data
+Note: tests are using the same database as the application in run mode, however, thanks to `@Transactional`
+and `@Rollback` annotations, the test data
 should be deleted after the test is completed.
 
 ### Database
@@ -125,31 +132,44 @@ curl -X PUT 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/j
 curl -X DELETE 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json'
 ```
 
-6. Inventory for a book by ISBN `GET /api/v1/inventory/isbn/{isbn}/copies`, responds with body of inventory, response status 200 OK.
+6. Inventory for a book by ISBN `GET /api/v1/inventory/isbn/{isbn}/copies`, responds with body of inventory, response
+   status 200 OK.
+
 ```bash
 curl -X 'GET' \
   'http://localhost:8080/api/v1/inventory/isbn/3fa85f64-5717-4562-b3fc-2c963f66afa9/copies' \
   -H 'accept: application/json'
 ```
-7. Update Inventory for a book by ISBN `UPDATE /api/v1/inventory/isbn/{isbn}/copies`, responds with body of inventory, response status 200 OK.
+
+7. Update Inventory for a book by ISBN `UPDATE /api/v1/inventory/isbn/{isbn}/copies`, responds with body of inventory,
+   response status 200 OK.
+
 ```bash
 curl -X 'GET' \
   'http://localhost:8080/api/v1/inventory/isbn/3fa85f64-5717-4562-b3fc-2c963f66afa9/copies' \
   -H 'accept: application/json'
 ```
-8. Inventory for a book by AUTHOR `GET /api/v1/inventory/author/{author}/copies`, responds with body of inventory, response status 200 OK.
+
+8. Inventory for a book by AUTHOR `GET /api/v1/inventory/author/{author}/copies`, responds with body of inventory,
+   response status 200 OK.
+
 ```bash
 curl -X 'GET' \
   'http://localhost:8080/api/v1/inventory/author/Author1/copies' \
   -H 'accept: application/json'
 ```
-9. Inventory for a book by TITLE `GET /api/v1/inventory/author/{title}/copies`, responds with body of inventory, response status 200 OK.
+
+9. Inventory for a book by TITLE `GET /api/v1/inventory/author/{title}/copies`, responds with body of inventory,
+   response status 200 OK.
+
 ```bash
 curl -X 'GET' \
   'http://localhost:8080/api/v1/inventory/title/Title1/copies' \
   -H 'accept: application/json'
 ```
+
 10. Inventory for all book `GET /api/v1/inventory/copies`, responds with body of inventory, response status 200 OK.
+
 ```bash
 curl -X 'GET' \
   'http://localhost:8080/api/v1/inventory/copies' \
@@ -159,29 +179,37 @@ curl -X 'GET' \
 We are using [BookDto](src/main/java/fi/epassi/recruitment/dto/BookDto.java) in the communication,
 and [BookModel](src/main/java/fi/epassi/recruitment/model/BookModel.java) for storing Book information in the database.
 
-Note: each response is encapsulated in [ApiResponse](src/main/java/fi/epassi/recruitment/api/ApiResponse.java) entity, which we use, to make sure that
+Note: each response is encapsulated in [ApiResponse](src/main/java/fi/epassi/recruitment/api/ApiResponse.java) entity,
+which we use, to make sure that
 we will always have the same structure of the response.
 
 ## Analyze Performance Metrics
-Actuator endpoints provide various performance metrics and information about your application. Here are some commonly used endpoints for performance monitoring:
+
+Actuator endpoints provide various performance metrics and information about your application. Here are some commonly
+used endpoints for performance monitoring:
 
 - `http://localhost:8080/actuator/metrics` \
-Provides various metrics such as JVM memory usage, CPU usage, HTTP request metrics, database connection pool metrics, etc.
+  Provides various metrics such as JVM memory usage, CPU usage, HTTP request metrics, database connection pool metrics,
+  etc.
 
 
 - `http://localhost:8080/actuator/health` \
-Shows the health status of your application and its dependencies. It can be used to check if your application is up and running properly.
+  Shows the health status of your application and its dependencies. It can be used to check if your application is up
+  and running properly.
 
-- `http://localhost:8080/actuator/threaddump`: \ 
-Generates a thread dump of your application, which can be useful for analyzing thread activity and identifying thread-related issues.
+- `http://localhost:8080/actuator/threaddump`: \
+  Generates a thread dump of your application, which can be useful for analyzing thread activity and identifying
+  thread-related issues.
 
 - `http://localhost:8080/actuator/env`: \
-Displays environment properties and configuration settings of your application.
+  Displays environment properties and configuration settings of your application.
 
 - `http://localhost:8080/actuator/info`: \
-Shows custom application information and metadata.
-- 
+  Shows custom application information and metadata.
+-
+
 ## Swagger-ui
+
 http://localhost:8080/swagger-ui/index.html
 
 ## Your assignments
@@ -192,7 +220,8 @@ Before working on the tasks, make sure, that you have initialized fresh git repo
 
 - **Backstory**:\
   We have some time before the grand opening of the Bookstore, and we are still missing the most important feature.\
-  We do not have the possibility to know how many books we have available to sell (how many book copies we have in the Inventory).
+  We do not have the possibility to know how many books we have available to sell (how many book copies we have in the
+  Inventory).
 
 
 - **Assigment description**:\
@@ -209,12 +238,14 @@ Before working on the tasks, make sure, that you have initialized fresh git repo
 ### Task #2 - First issues & technical debt impact
 
 - **Backstory**:\
-  Initially, we did an MVP (Minimum Viable Product) implementation, where all Books are being listed at once, on a single long page.
+  Initially, we did an MVP (Minimum Viable Product) implementation, where all Books are being listed at once, on a
+  single long page.
   We have also added the possibility to search for Books by Authors or Titles, which helped a lot.\
   In a very short time, we got pretty successful, with more than tens of thousands of books in the inventory.\
   Hence, the actual solution is no longer working, as there are too many books showing on a single page.\
   We need to add the possibility of returning only part of the data.\
-  Also, for some time already, people are complaining that listing all the books takes a really long time, so we should also look into it as well.
+  Also, for some time already, people are complaining that listing all the books takes a really long time, so we should
+  also look into it as well.
 
 
 - **Assigment description**:\
@@ -225,22 +256,26 @@ Before working on the tasks, make sure, that you have initialized fresh git repo
 - **Backstory**:\
   The business is now super successful.\
   We are now selling thousands of books every day, with over a million books in the inventory.\
-  As a company, we have invested and bought 5 buildings in different cities, in order to open other branches of the business there.\
+  As a company, we have invested and bought 5 buildings in different cities, in order to open other branches of the
+  business there.\
   Also, we will as well start selling books online!
 
 
 - **Assigment description**:\
-  You need to implement solution introducing a "Bookstore" entity, with name, address etc. and extend the way that we're storing number of available
+  You need to implement solution introducing a "Bookstore" entity, with name, address etc. and extend the way that we're
+  storing number of available
   Books to now be related to specific Bookstore.
 
 ## Recruitment Task Delivery
 
 Upon completing your assignment, please follow the steps below:
 
-- Create a **private** repository on [GitHub](https://github.com). ([See screenshot](github/create-private-repository.png))
+- Create a **private** repository
+  on [GitHub](https://github.com). ([See screenshot](github/create-private-repository.png))
 - Upload the code to the mentioned repository. ([See screenshot](github/push-existing-repo-to-origin.png))
 - Invite a collaborator with the name "epassi-group":
-    - Navigate to `Settings` > `Access` > `Collaborators` > `Add People` ([See screenshot](github/manage-repository-access.png))
+    - Navigate
+      to `Settings` > `Access` > `Collaborators` > `Add People` ([See screenshot](github/manage-repository-access.png))
     - Locate the account `epassi-group` and
       click `Add epassi-group to this repository` ([See screenshot](github/invite-collaborator-to-repository.png))
 - Send an email to `recruitment-task@epassi.com` and your technical recruiters as recipients.\
