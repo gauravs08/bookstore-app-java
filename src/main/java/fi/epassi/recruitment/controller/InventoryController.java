@@ -28,7 +28,7 @@ public class InventoryController {
     private final InventoryService inventoryService;
 
     @GetMapping(value = "/isbn/{isbn}/copies", produces = APPLICATION_JSON_VALUE)
-    Flux<ApiResponse<InventoryDto>> getInventoryCopiesByIsbn(
+    public Flux<ApiResponse<InventoryDto>> getInventoryCopiesByIsbn(
             @PathVariable("isbn") @Validated UUID isbn) {
         return inventoryService.getCopiesByIsbn(isbn)
                 .map(ApiResponse::ok)
@@ -36,7 +36,7 @@ public class InventoryController {
     }
 
     @GetMapping(value = "/author/{author}/copies", produces = APPLICATION_JSON_VALUE)
-    Mono<ApiResponse<Map<String, Integer>>> getInventoryCopiesByAuthor(
+    public Mono<ApiResponse<Map<String, Integer>>> getInventoryCopiesByAuthor(
             @PathVariable("author") String author) {
         return inventoryService.getCopiesByAuthorBookstore(author)
                 .map(ApiResponse::ok)
@@ -44,7 +44,7 @@ public class InventoryController {
     }
 
     @GetMapping(value = "/title/{title}/copies", produces = APPLICATION_JSON_VALUE)
-    Mono<ApiResponse<Map<String, Integer>>> getInventoryCopiesByTitle(
+    public Mono<ApiResponse<Map<String, Integer>>> getInventoryCopiesByTitle(
             @PathVariable("title") String title) {
         return inventoryService.getCopiesByTitleBookstore(title)
                 .map(ApiResponse::ok)
@@ -52,7 +52,7 @@ public class InventoryController {
     }
 
     @PutMapping(value = "/isbn/{isbn}/copies", produces = APPLICATION_JSON_VALUE)
-    Mono<ApiResponse<UUID>> updateInventoriesCopiesByIsbn(
+    public Mono<ApiResponse<UUID>> updateInventoriesCopiesByIsbn(
             @PathVariable("isbn") @Validated UUID isbn,
             @RequestParam(value = "copies") Integer copies,
             @RequestParam(value = "bookstore_id", required = false) Long bookstore_id) {
@@ -71,7 +71,7 @@ public class InventoryController {
     }
 
     @GetMapping(value = "/copies", produces = APPLICATION_JSON_VALUE)
-    Mono<ApiResponse<InventoryGlobalDto>> getInventoryTotalCopies() {
+    public Mono<ApiResponse<InventoryGlobalDto>> getInventoryTotalCopies() {
         return inventoryService.getTotalCopies()
                 .map(ApiResponse::ok)
                 .switchIfEmpty(Mono.error(new InventoryNotFoundException()));

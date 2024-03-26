@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -57,13 +58,11 @@ public class BookController {
     }
 
     @DeleteMapping(value = "/{isbn}")
-    ApiResponse<Void> deleteBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
-        try {
-            bookService.deleteBookWithIsbn(isbn);
-            return ApiResponse.ok();
-        } catch (BookNotFoundException ex) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found", ex);
-        }
+    Mono<ApiResponse<Object>> deleteBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
+        return bookService.deleteBookWithIsbn(isbn)
+                .thenReturn(ApiResponse.ok())
+                .onErrorResume(BookNotFoundException.class, ex ->
+                        Mono.error(new BookNotFoundException( "ISBN", isbn.toString())));
     }
 
 }
