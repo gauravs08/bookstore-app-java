@@ -6,8 +6,6 @@ import fi.epassi.recruitment.dto.InventoryDto;
 import fi.epassi.recruitment.dto.InventoryGlobalDto;
 import fi.epassi.recruitment.exception.BookstoreNotFoundException;
 import fi.epassi.recruitment.exception.InventoryNotFoundException;
-import fi.epassi.recruitment.model.BookModel;
-import fi.epassi.recruitment.model.Inventory;
 import fi.epassi.recruitment.services.InventoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +19,8 @@ import reactor.test.StepVerifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -37,7 +36,7 @@ public class InventoryControllerTest {
     @Test
     void testGetInventoryCopiesByIsbn() {
         UUID isbn = UUID.randomUUID();
-        InventoryDto inventoryDto = new InventoryDto(isbn,"Title","Author",10,1001L);
+        InventoryDto inventoryDto = new InventoryDto(isbn, "Title", "Author", 10, 1001L);
         when(inventoryService.getCopiesByIsbn(isbn))
                 .thenReturn(Flux.just(inventoryDto));
 
@@ -135,43 +134,40 @@ public class InventoryControllerTest {
         StepVerifier.create(response)
                 .expectErrorMatches(throwable ->
                         throwable instanceof InventoryNotFoundException &&
-                                throwable.getMessage().contains("No inventory found with ISBN: "+isbn))
+                                throwable.getMessage().contains("No inventory found with ISBN: " + isbn))
                 .verify();
     }
 
     @Test
     void testGetInventoryCopiesByAuthor_NotFound() {
-        // Arrange
         String author = "UnknownAuthor";
         when(inventoryService.getCopiesByAuthorBookstore(author))
                 .thenReturn(Mono.error(new InventoryNotFoundException("Author", author)));
 
-        // Act
+
         Mono<ApiResponse<Map<String, Integer>>> response = inventoryController.getInventoryCopiesByAuthor(author);
 
-        // Assert
         StepVerifier.create(response)
                 .expectErrorMatches(throwable ->
                         throwable instanceof InventoryNotFoundException &&
-                                throwable.getMessage().contains("No inventory found with Author: "+author))
+                                throwable.getMessage().contains("No inventory found with Author: " + author))
                 .verify();
     }
 
     @Test
     void testGetInventoryCopiesByTitle_NotFound() {
-        // Arrange
         String title = "UnknownTitle";
         when(inventoryService.getCopiesByTitleBookstore(title))
                 .thenReturn(Mono.error(new InventoryNotFoundException("Title", title)));
 
-        // Act
+
         Mono<ApiResponse<Map<String, Integer>>> response = inventoryController.getInventoryCopiesByTitle(title);
 
         // Assert
         StepVerifier.create(response)
                 .expectErrorMatches(throwable ->
                         throwable instanceof InventoryNotFoundException &&
-                                throwable.getMessage().contains("No inventory found with Title: "+title))
+                                throwable.getMessage().contains("No inventory found with Title: " + title))
                 .verify();
     }
 

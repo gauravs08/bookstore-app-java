@@ -9,13 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
 import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -62,7 +59,7 @@ public class BookController {
         return bookService.deleteBookWithIsbn(isbn)
                 .thenReturn(ApiResponse.ok())
                 .onErrorResume(BookNotFoundException.class, ex ->
-                        Mono.error(new BookNotFoundException( "ISBN", isbn.toString())));
+                        Mono.error(new BookNotFoundException("ISBN", isbn.toString())));
     }
 
 }

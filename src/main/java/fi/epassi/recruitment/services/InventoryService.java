@@ -43,16 +43,14 @@ public class InventoryService {
     }
 
     private Mono<Map<String, Integer>> getCopiesMapByBookStoreId(Flux<BookModel> books) {
-        return books.flatMap(book -> {
-                    return inventoryRepository.findByIsbn(book.getIsbn())
-                            .flatMap(inventory -> {
-                                Long bookstoreId = inventory.getBookstoreId();
-                                int copies = inventory.getCopies();
-                                Map<Long, Integer> map = new HashMap<>();
-                                map.put(bookstoreId, copies);
-                                return Mono.just(map);
-                            });
-                })
+        return books.flatMap(book -> inventoryRepository.findByIsbn(book.getIsbn())
+                .flatMap(inventory -> {
+                    Long bookstoreId = inventory.getBookstoreId();
+                    int copies = inventory.getCopies();
+                    Map<Long, Integer> map = new HashMap<>();
+                    map.put(bookstoreId, copies);
+                    return Mono.just(map);
+                }))
                 .reduce(new HashMap<>(), (map1, map2) -> {
                     map2.forEach((bookstoreId, copies) -> map1.merge(String.valueOf(bookstoreId), copies, Integer::sum));
                     return map1;
@@ -70,10 +68,8 @@ public class InventoryService {
     public Mono<UUID> updateInventory(UUID isbn, Integer copies, Long bookstore_id) {
         return inventoryRepository.findByIsbnAndBookstoreId(isbn, bookstore_id)
                 .flatMap(inventory -> {
-                    //int updatedCopies = inventory.getCopies() + copies;
                     inventory.setCopies(copies);
                     inventory.setBookstoreId(bookstore_id);
-                    //inventory.setNewInventory(false);
                     return inventoryRepository.save(inventory).map(Inventory::getIsbn);
                 })
                 .switchIfEmpty(createNewInventory(isbn, copies, bookstore_id));

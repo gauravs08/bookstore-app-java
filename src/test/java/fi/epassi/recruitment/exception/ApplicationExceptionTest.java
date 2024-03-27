@@ -14,51 +14,51 @@ class ApplicationExceptionTest {
 
     @Test
     void shouldCreationApplicationExceptionWithoutParams() {
-        // When
+
         var ex = new ApplicationException();
 
-        // Then
+
         assertThat(ex.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void shouldCreationApplicationExceptionWithCustomMessage() {
-        // When
+
         var ex = new ApplicationException(CUSTOM_MESSAGE);
 
-        // Then
+
         assertThat(ex.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
         assertThat(ex.getMessage()).contains(CUSTOM_MESSAGE);
     }
 
     @Test
     void shouldCreationApplicationExceptionWithCustomResponseStatus() {
-        // When
+
         var ex = new ApplicationException(BAD_REQUEST);
 
-        // Then
+
         assertThat(ex.getStatusCode()).isEqualTo(BAD_REQUEST);
     }
 
     @Test
     void shouldCreationApplicationExceptionWithCustomResponseStatusAndMessage() {
-        // When
+
         var ex = new ApplicationException(UNAUTHORIZED, CUSTOM_MESSAGE);
 
-        // Then
+
         assertThat(ex.getStatusCode()).isEqualTo(UNAUTHORIZED);
         assertThat(ex.getMessage()).contains(CUSTOM_MESSAGE);
     }
 
     @Test
     void shouldCreationApplicationExceptionWithCustomMessageAndThrowable() {
-        // When
+
         var throwableMock = mock(Throwable.class);
         when(throwableMock.getMessage()).thenReturn(INTERNAL_CAUSE_MESSAGE);
 
         var ex = new ApplicationException(CUSTOM_MESSAGE, throwableMock);
 
-        // Then
+
         assertThat(ex.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
         assertThat(ex.getCause().getMessage()).isEqualTo(INTERNAL_CAUSE_MESSAGE);
         assertThat(ex.getMessage()).contains(CUSTOM_MESSAGE);
@@ -66,26 +66,26 @@ class ApplicationExceptionTest {
 
     @Test
     void shouldCreationApplicationExceptionWithCustomResponseStatusAndThrowable() {
-        // When
+
         var throwableMock = mock(Throwable.class);
         when(throwableMock.getMessage()).thenReturn(INTERNAL_CAUSE_MESSAGE);
 
         var ex = new ApplicationException(SERVICE_UNAVAILABLE, throwableMock);
 
-        // Then
+
         assertThat(ex.getStatusCode()).isEqualTo(SERVICE_UNAVAILABLE);
         assertThat(ex.getCause().getMessage()).contains(INTERNAL_CAUSE_MESSAGE);
     }
 
     @Test
     void shouldCreationApplicationExceptionWithCustomResponseStatusAndMessageAndThrowable() {
-        // When
+
         var throwableMock = mock(Throwable.class);
         when(throwableMock.getMessage()).thenReturn(INTERNAL_CAUSE_MESSAGE);
 
         var ex = new ApplicationException(SERVICE_UNAVAILABLE, CUSTOM_MESSAGE, throwableMock);
 
-        // Then
+
         assertThat(ex.getStatusCode()).isEqualTo(SERVICE_UNAVAILABLE);
         assertThat(ex.getMessage()).contains(CUSTOM_MESSAGE);
         assertThat(ex.getCause().getMessage()).contains(INTERNAL_CAUSE_MESSAGE);
@@ -93,13 +93,13 @@ class ApplicationExceptionTest {
 
     @Test
     void shouldCreationApplicationExceptionWithCustomResponseStatusAndEmptyMessageAndThrowable() {
-        // When
+
         var throwableMock = mock(Throwable.class);
         when(throwableMock.getMessage()).thenReturn(INTERNAL_CAUSE_MESSAGE);
 
         var ex = new ApplicationException(SERVICE_UNAVAILABLE, null, throwableMock);
 
-        // Then
+
         assertThat(ex.getStatusCode()).isEqualTo(SERVICE_UNAVAILABLE);
         assertThat(ex.getCause().getMessage()).contains(INTERNAL_CAUSE_MESSAGE);
     }

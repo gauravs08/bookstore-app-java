@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,14 +27,9 @@ public class BookService {
     private final BookRepository bookRepository;
     private final InventoryRepository inventoryRepository;
 
-    //    @Autowired
-//    public BookService(BookRepository bookRepository, InventoryRepository inventoryRepository){
-//        this.bookRepository=bookRepository;
-//        this.inventoryRepository=inventoryRepository;
-//    }
+
     public Mono<UUID> createBook(BookDto bookDto) {
         BookModel bookModel = toBookModel(bookDto);
-        //bookModel.setAsNew();
         return bookRepository.save(bookModel)
                 .map(BookModel::getIsbn);
     }
@@ -50,7 +44,6 @@ public class BookService {
     public Mono<BookDto> getBookByIsbn(@NonNull UUID isbn) throws BookNotFoundException {
         return bookRepository.findByIsbn(isbn)
                 .map(this::toBookDto);
-        //.(Mono.just(new BookNotFoundException(isbn.toString()));
     }
 
     @Cacheable(key = "{#author, #title, #pageable}")
@@ -69,7 +62,7 @@ public class BookService {
         return booksFlux.map(this::toBookDto)
                 .collectList()
                 .map(books -> {
-                    long totalBooks = books.size(); // Assuming no separate count query
+                    long totalBooks = books.size();
                     int totalPages = (int) Math.ceil((double) totalBooks / pageable.getPageSize());
                     return new ApiResponsePage<>(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), books, totalBooks, totalPages, pageable.getPageNumber(), pageable.getPageSize());
                 });
