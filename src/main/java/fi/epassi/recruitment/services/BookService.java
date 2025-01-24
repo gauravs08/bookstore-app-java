@@ -43,7 +43,8 @@ public class BookService {
     @Cacheable(key = "{#isbn}")
     public Mono<BookDto> getBookByIsbn(@NonNull UUID isbn) throws BookNotFoundException {
         return bookRepository.findByIsbn(isbn)
-                .map(this::toBookDto);
+                .map(this::toBookDto)
+                .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN", isbn.toString())));
     }
 
     @Cacheable(key = "{#author, #title, #pageable}")

@@ -56,7 +56,9 @@ git commit -m "Initial commit"
 
 ```bash
 ./gradlew bootRun
+
 # or
+
 ./gradlew clean build && java -jar build/libs/recruitment-app.jar
 ```
 
@@ -212,6 +214,18 @@ used endpoints for performance monitoring:
 
 http://localhost:8080/swagger-ui/index.html
 
+## Test Coverage
+To run tests and generate coverage reports:
+
+1. Run your tests:
+`./gradlew test`
+
+2. Generate the JaCoCo report:
+`./gradlew jacocoTestReport`
+
+3. View the HTML report located in the build/jacocoHtml directory.
+
+
 ## Your assignments
 
 Before working on the tasks, make sure, that you have initialized fresh git repository.
@@ -281,3 +295,17 @@ Upon completing your assignment, please follow the steps below:
 - Send an email to `recruitment-task@epassi.com` and your technical recruiters as recipients.\
   Provide information indicating that the repository has been shared, including the repository name.\
   Then we will be able to continue the Recruitment process.
+
+
+## feedback from epassi
+There were failing tests in all three tasks
+
+The test could have benefited from power of frameworks like hibernate. Setting up relations between entities would have been a positive.
+
+Some code practices were not followed, for example,  there was a lot of code left commented out
+
+Idea with cache was okay, but would be good to look at db potential issues like lack of indices
+
+We specifically used domain based design of the application which we didn't want to be changed to service layer
+
+We would want to have a higher test coverage which is at least 80%

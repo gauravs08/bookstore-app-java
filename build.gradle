@@ -32,6 +32,10 @@ ext {
     set('springCloudVersion', '2023.0.0')
 }
 
+jacoco {
+    toolVersion = "0.8.11" // Specify the JaCoCo version
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -116,4 +120,23 @@ jacocoTestReport {
     }
 }
 
+jacocoTestReport {
+    dependsOn test // Ensures tests run before generating the report
+
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.outputLocation.set(file("${buildDir}/jacocoHtml"))
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.80 // Set minimum test coverage (e.g., 80%)
+            }
+        }
+    }
+}
 

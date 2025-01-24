@@ -26,7 +26,7 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    Mono<ApiResponsePage<BookDto>> getBooks(
+    public Mono<ApiResponsePage<BookDto>> getBooks(
             @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(defaultValue = "0") int page,
@@ -35,19 +35,19 @@ public class BookController {
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    Mono<ApiResponse<UUID>> createBook(@RequestBody @Validated BookDto bookDto) {
+    public Mono<ApiResponse<UUID>> createBook(@RequestBody @Validated BookDto bookDto) {
         return bookService.createBook(bookDto)
                 .map(ApiResponse::ok);
     }
 
     @PutMapping(consumes = APPLICATION_JSON_VALUE)
-    Mono<ApiResponse<UUID>> updateBook(@RequestBody @Validated BookDto bookDto) {
+    public Mono<ApiResponse<UUID>> updateBook(@RequestBody @Validated BookDto bookDto) {
         return bookService.updateBook(bookDto)
                 .map(ApiResponse::ok);
     }
 
     @GetMapping(value = "/{isbn}", produces = APPLICATION_JSON_VALUE)
-    Mono<ApiResponse<BookDto>> getBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
+    public Mono<ApiResponse<BookDto>> getBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
         return bookService.getBookByIsbn(isbn)
                 .map(ApiResponse::ok)
                 .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN", isbn.toString())));
@@ -55,7 +55,7 @@ public class BookController {
     }
 
     @DeleteMapping(value = "/{isbn}")
-    Mono<ApiResponse<Object>> deleteBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
+    public Mono<ApiResponse<Object>> deleteBookByIsbn(@PathVariable("isbn") @Validated UUID isbn) {
         return bookService.deleteBookWithIsbn(isbn)
                 .thenReturn(ApiResponse.ok())
                 .onErrorResume(BookNotFoundException.class, ex ->

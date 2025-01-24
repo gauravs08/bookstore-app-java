@@ -102,7 +102,10 @@ public class InventoryControllerTest {
         Mono<ApiResponse<UUID>> response = inventoryController.updateInventoriesCopiesByIsbn(isbn, copies, bookstoreId);
 
         StepVerifier.create(response)
-                .expectNext(expectedResponse)
+                //.expectNext(expectedResponse)
+                .expectNextMatches(apiResponse -> apiResponse.getStatusCode() == 200
+                        && apiResponse.getStatusMessage().equals("OK")
+                && apiResponse.getResponse().equals(isbn))
                 .expectComplete()
                 .verify();
     }
