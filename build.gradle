@@ -4,7 +4,7 @@ plugins {
     id 'org.cyclonedx.bom' version '1.8.1'
     id 'com.github.ben-manes.versions' version '0.50.0'
     id 'com.adarshr.test-logger' version '4.0.0'
-
+    id 'org.flywaydb.flyway' version '9.15.0'
     id 'java'
     id 'idea'
     id 'jacoco'
@@ -24,8 +24,8 @@ java {
 
 repositories {
     mavenCentral()
-    maven { url 'https://jitpack.io' }
-    maven { url 'https://plugins.gradle.org/m2/' }
+    maven {url 'https://jitpack.io'}
+    maven {url 'https://plugins.gradle.org/m2/'}
 }
 
 ext {
@@ -39,6 +39,11 @@ jacoco {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // hiberate
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.hibernate:hibernate-core:6.6.5.Final'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
     // -- swagger integration
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
@@ -140,3 +145,16 @@ jacocoTestCoverageVerification {
     }
 }
 
+// Flyway configuration (optional)
+flyway {
+    url = 'jdbc:h2:file:./db/recruitment_app;MODE=MYSQL'
+    user = 'recruitment_app'
+    password = 'recruitment_app'
+    locations = ['classpath:db/migration']
+}
+
+//
+//task flywayRepair(type: FlywayRepair) {
+//    description = 'Repairs the Flyway migrations'
+//    group = 'Flyway'
+//}
