@@ -2,6 +2,7 @@ package fi.book.org.services;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -45,7 +46,7 @@ public class BookService {
                 });
     }
 
-
+    @CacheEvict(key = "{#id}")
     public Mono<Void> deleteBookWithIsbn(@NonNull UUID id) {
         return bookRepository.deleteById(id)
                 .onErrorResume(e -> {
@@ -62,7 +63,7 @@ public class BookService {
                 .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN", id.toString())));
     }
 
-    @Cacheable(key = "{#author, #title, #bookstoreId, #pageable}")
+    @Cacheable(key = "{#author, #title, #bookstoreId}")
     public Mono<ApiResponsePage<BookDto>> getBooks(String author, String title, Long bookstoreId, Pageable pageable) {
         Flux<BookModel> booksFlux;
 
@@ -86,6 +87,7 @@ public class BookService {
                 });
     }
 
+    @CacheEvict(key = "{#bookDto.author, #bookDto.title, #bookDto.bookstoreId}")
     public Mono<UUID> updateBook(BookDto bookDto) {
         return bookRepository.findById(bookDto.getId())
                 .flatMap(existingBook -> {
