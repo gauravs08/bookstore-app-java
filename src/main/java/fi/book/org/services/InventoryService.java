@@ -70,6 +70,7 @@ public class InventoryService {
         return inventoryRepository.findByIdAndBookstoreId(id, bookstore_id)
                 .flatMap(inventory -> {
                     inventory.setCopies(copies);
+                    inventory.setNew(false);
                     inventory.setBookstoreId(bookstore_id);
                     return inventoryRepository.save(inventory).map(Inventory::getId);
                 })
@@ -101,6 +102,7 @@ public class InventoryService {
                         Inventory newInventory = new Inventory();
                         newInventory.setId(id);
                         newInventory.setCopies(copies);
+                        newInventory.setNew(true);
                         newInventory.setBookstoreId(bookstoreId);
                         return inventoryRepository.save(newInventory).map(Inventory::getId);
                     } else {

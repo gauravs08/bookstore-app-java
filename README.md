@@ -106,6 +106,43 @@ When you will start the project or run the tests the database file will be
 created in `db` directory in root project.\
 
 ### Rest API
+http://localhost:8080/webjars/swagger-ui/index.html#/
+
+#### APIs Access level 
+Access Level for APIs
+Based on your requirements, here's the best access level for each API:
+we have two users by default
+
+```admin | admin123 | ROLE_ADMIN```
+
+```user | user123 | ROLE_USER```
+# API Access Levels
+
+This document outlines the access levels for different APIs in the system.
+
+## **Access Control Matrix**
+
+| **Controller**   | **Method** | **Endpoint**                                | **Access Level**             |
+|------------------|------------|---------------------------------------------|------------------------------|
+| **Inventory**    | **GET**    | `/api/v1/inventory/isbn/{isbn}/copies`      | 🔒 Any authenticated user    |
+|                  | **PUT**    | `/api/v1/inventory/isbn/{isbn}/copies`      | 🔑 Only Admin                |
+|                  | **GET**    | `/api/v1/inventory/title/{title}/copies`    | 🔒 Any authenticated user    |
+|                  | **GET**    | `/api/v1/inventory/copies`                  | 🔒 Any authenticated user    |
+|                  | **GET**    | `/api/v1/inventory/author/{author}/copies`  | 🔒 Any authenticated user    |
+| **Book**         | **GET**    | `/api/v1/books`                             | 🔒 Any authenticated user    |
+|                  | **PUT**    | `/api/v1/books`                             | 🔑 Only Admin                |
+|                  | **POST**   | `/api/v1/books`                             | 🔒 Any authenticated user    |
+|                  | **GET**    | `/api/v1/books/{isbn}`                      | 🔒 Any authenticated user    |
+|                  | **DELETE** | `/api/v1/books/{isbn}`                      | 🔑 Only Admin                |
+| **Auth**         | **POST**   | `/auth/register`                            | 🔑 Only Admin                |
+|                  | **POST**   | `/auth/login`                               | 🌎 Public                    |
+
+---
+
+## **Legend**
+- 🔒 **Any authenticated user** → Requires login (JWT-based authentication)
+- 🔑 **Only Admin** → Requires admin role (`ROLE_ADMIN`)
+- 🌎 **Public** → No authentication required
 
 Available REST API methods:
 

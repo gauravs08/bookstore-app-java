@@ -37,7 +37,8 @@ jacoco {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // hiberate
@@ -46,7 +47,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 
     // -- swagger integration
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.4.0'
+
 
     // -- actuator health check
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -59,9 +61,15 @@ dependencies {
     implementation 'org.zalando:problem-violations:0.29.1'
     implementation 'org.zalando:problem-spring-web:0.29.1'
 
+
+    // -- Spring security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-web'
+    implementation 'org.springframework.security:spring-security-oauth2-jose:6.2.0'
+    implementation 'org.springframework.security:spring-security-oauth2-resource-server:6.2.3'
+    implementation 'io.jsonwebtoken:jjwt:0.12.3'
+
     // -- DB
-//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'com.h2database:h2:2.2.224'
     implementation 'org.flywaydb:flyway-core:10.10.0'
     implementation 'org.flywaydb:flyway-mysql:10.10.0'

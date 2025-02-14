@@ -16,7 +16,6 @@ import fi.book.org.exception.BookCreateException;
 import fi.book.org.exception.BookNotFoundException;
 import fi.book.org.model.BookModel;
 import fi.book.org.repository.BookRepository;
-import fi.book.org.repository.BookstoreRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,6 @@ import reactor.core.publisher.Mono;
 public class BookService {
 
     private final BookRepository bookRepository;
-    private final BookstoreRepository bookstoreRepository;
     private final InventoryService inventoryService;
 
 

@@ -18,6 +18,7 @@ import fi.book.org.dto.InventoryGlobalDto;
 import fi.book.org.exception.BookstoreNotFoundException;
 import fi.book.org.exception.InventoryNotFoundException;
 import fi.book.org.services.InventoryService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -29,6 +30,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/inventory")
+@SecurityRequirement(name = "bearerAuth") // Apply JWT security
 public class InventoryController {
 
     private final InventoryService inventoryService;

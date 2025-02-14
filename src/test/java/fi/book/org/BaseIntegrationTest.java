@@ -16,7 +16,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Rollback
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@ComponentScan(basePackages = "fi.epassi.recruitment")
+@ComponentScan(basePackages = "fi.book.org")
 @TestInstance(PER_CLASS)
 public abstract class BaseIntegrationTest {
 
