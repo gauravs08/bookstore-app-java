@@ -85,7 +85,7 @@ public class BookService {
                 });
     }
 
-    @CacheEvict(key = "{#bookDto.author, #bookDto.title, #bookDto.bookstoreId}")
+    @CacheEvict(allEntries = true)
     public Mono<UUID> updateBook(BookDto bookDto) {
         return bookRepository.findById(bookDto.getId())
                 .flatMap(existingBook -> {
@@ -102,7 +102,7 @@ public class BookService {
                 .author(bookDto.getAuthor())
                 .title(bookDto.getTitle())
                 .price(bookDto.getPrice())
-                .bookstoreId(bookDto.getBookstoreId())
+                .bookstoreId(bookDto.getBookstore_id())
                 .build();
     }
 
@@ -112,7 +112,7 @@ public class BookService {
                 .author(bookModel.getAuthor())
                 .title(bookModel.getTitle())
                 .price(bookModel.getPrice())
-                .bookstoreId(bookModel.getBookstoreId())
+                .bookstore_id(bookModel.getBookstoreId())
                 .build();
     }
 }

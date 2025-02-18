@@ -57,7 +57,7 @@ class BookControllerTest {
                 .title("Reactive Spring")
                 .author("Josh Long")
                 .price(BigDecimal.valueOf(49.99))
-                .bookstoreId(1001L)
+                .bookstore_id(1001L)
                 .build();
     }
 

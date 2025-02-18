@@ -1,4 +1,4 @@
-# Epassi Recruitment App
+# Book App
 
 ## General information
 
@@ -50,27 +50,26 @@ git commit -m "Initial commit"
 
 ### Running & testing the application
 
-1. How to build project
+1.  How to build project
 
-```bash
-./gradlew clean build -x check
-```
+    ```bash
+    ./gradlew clean build -x check
+    ```
+2.  How to run tests
 
-2. How to run tests
+    ```
+    ./gradlew clean test
+    ```
 
-```
-./gradlew clean test
-```
+3.  How to run application
 
-3. How to run application
-
-```bash
-./gradlew bootRun
-
-# or
-
-./gradlew clean build && java -jar build/libs/recruitment-app.jar
-```
+    ```bash
+    ./gradlew bootRun
+    
+    # or
+    
+    ./gradlew clean build && java -jar build/libs/recruitment-app.jar
+    ```
 
 **Note**: Logs can be found in console or in directory: `logs/`.
 
@@ -107,6 +106,7 @@ created in `db` directory in root project.\
 
 ### Rest API
 http://localhost:8080/webjars/swagger-ui/index.html#/
+http://localhost:8080/swagger-ui.html
 
 #### APIs Access level 
 Access Level for APIs
@@ -117,7 +117,7 @@ we have two users by default
 
 ```user | user123 | ROLE_USER```
 # API Access Levels
-
+    JWT token is used to authenticate users in the system. The system has two types of users: Admin and User. Admin has full access to all APIs, while User has limited access to certain APIs.
 This document outlines the access levels for different APIs in the system.
 
 ## **Access Control Matrix**
@@ -149,104 +149,104 @@ Available REST API methods:
 1. Get list of all books: `GET /api/v1/books`, responds with body of
    `List<BookDto>`.
 
-```bash
-curl -X GET 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json'
-```
+    ```bash
+    curl -X GET 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json'
+    ```
 
 2. Get book by ISBN: `GET /api/v1/books/{isbn}`, responds with body of
    `BookDto`.
 
-```bash
-curl -X GET 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json' 
-```
+    ```bash
+    curl -X GET 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json' 
+    ```
 
 3. Create a book: `POST /api/v1/book`, responds with body of ISBN string.
 
-```bash
-curl -X POST 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json' --data-raw '{
-   "isbn": "5e0a115e-3160-4690-a7fe-50689cb23e68",
-   "title": "Lorem ipsum",
-   "author": "Cicero",
-   "price": "15.50"
-}'
-```
+    ```bash
+    curl -X POST 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json' --data-raw '{
+       "isbn": "5e0a115e-3160-4690-a7fe-50689cb23e68",
+       "title": "Lorem ipsum",
+       "author": "Cicero",
+       "price": "15.50"
+    }'
+    ```
 
 4. Update a book: `PUT /api/v1/book`, responds with body of ISBN string.
 
-```bash
-curl -X PUT 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json' --data-raw '{
-   "isbn": "5e0a115e-3160-4690-a7fe-50689cb23e68",
-   "title": "Lorem ipsum",
-   "author": "Cicero",
-   "price": "25.50"
-}'
-```
+    ```bash
+    curl -X PUT 'http://localhost:8080/api/v1/books' -H 'Content-Type: application/json' --data-raw '{
+       "isbn": "5e0a115e-3160-4690-a7fe-50689cb23e68",
+       "title": "Lorem ipsum",
+       "author": "Cicero",
+       "price": "25.50"
+    }'
+    ```
 
 5. Delete a book by ISBN: `DELETE /api/v1/books/{isbn}`, responds without body,
    response status 200 OK.
 
-```bash
-curl -X DELETE 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json'
-```
+    ```bash
+    curl -X DELETE 'http://localhost:8080/api/v1/books/5e0a115e-3160-4690-a7fe-50689cb23e68' -H 'Content-Type: application/json'
+    ```
 
 6. Inventory for a book by ISBN `GET /api/v1/inventory/isbn/{isbn}/copies`,
    responds with body of inventory, response
    status 200 OK.
 
-```bash
-curl -X 'GET' \
-  'http://localhost:8080/api/v1/inventory/isbn/3fa85f64-5717-4562-b3fc-2c963f66afa9/copies' \
-  -H 'accept: application/json'
-```
+    ```bash
+    curl -X 'GET' \
+      'http://localhost:8080/api/v1/inventory/isbn/3fa85f64-5717-4562-b3fc-2c963f66afa9/copies' \
+      -H 'accept: application/json'
+    ```
 
 7. Update Inventory for a book by ISBN
    `UPDATE /api/v1/inventory/isbn/{isbn}/copies`, responds with body of
    inventory,
    response status 200 OK.
 
-```bash
-curl -X 'GET' \
-  'http://localhost:8080/api/v1/inventory/isbn/3fa85f64-5717-4562-b3fc-2c963f66afa9/copies' \
-  -H 'accept: application/json'
-```
+    ```bash
+    curl -X 'GET' \
+      'http://localhost:8080/api/v1/inventory/isbn/3fa85f64-5717-4562-b3fc-2c963f66afa9/copies' \
+      -H 'accept: application/json'
+    ```
 
 8. Inventory for a book by AUTHOR
    `GET /api/v1/inventory/author/{author}/copies`, responds with body of
    inventory,
    response status 200 OK.
 
-```bash
-curl -X 'GET' \
-  'http://localhost:8080/api/v1/inventory/author/Author1/copies' \
-  -H 'accept: application/json'
-```
+    ```bash
+    curl -X 'GET' \
+      'http://localhost:8080/api/v1/inventory/author/Author1/copies' \
+      -H 'accept: application/json'
+    ```
 
 9. Inventory for a book by TITLE `GET /api/v1/inventory/author/{title}/copies`,
    responds with body of inventory,
    response status 200 OK.
 
-```bash
-curl -X 'GET' \
-  'http://localhost:8080/api/v1/inventory/title/Title1/copies' \
-  -H 'accept: application/json'
-```
+    ```bash
+    curl -X 'GET' \
+      'http://localhost:8080/api/v1/inventory/title/Title1/copies' \
+      -H 'accept: application/json'
+    ```
 
 10. Inventory for all book `GET /api/v1/inventory/copies`, responds with body of
     inventory, response status 200 OK.
 
-```bash
-curl -X 'GET' \
-  'http://localhost:8080/api/v1/inventory/copies' \
-  -H 'accept: application/json'
-```
+    ```bash
+    curl -X 'GET' \
+      'http://localhost:8080/api/v1/inventory/copies' \
+      -H 'accept: application/json'
+    ```
 
-We are using [BookDto](src/main/java/fi/epassi/recruitment/dto/BookDto.java) in
+We are using [BookDto](src/main/java/fi/book/org/dto/BookDto.java) in
 the communication,
-and [BookModel](src/main/java/fi/epassi/recruitment/model/BookModel.java) for
+and [BookModel](src/main/java/fi/book/org/model/BookModel.java) for
 storing Book information in the database.
 
 Note: each response is encapsulated
-in [ApiResponse](src/main/java/fi/epassi/recruitment/api/ApiResponse.java)
+in [ApiResponse](src/main/java/fi/book/org/api/ApiResponse.java)
 entity,
 which we use, to make sure that
 we will always have the same structure of the response.
@@ -366,26 +366,6 @@ repository.
   storing number of available
   Books to now be related to specific Bookstore.
 
-## Recruitment Task Delivery
-
-Upon completing your assignment, please follow the steps below:
-
-- Create a **private** repository
-  on [GitHub](https://github.com). ([See screenshot](github/create-private-repository.png))
-- Upload the code to the mentioned
-  repository. ([See screenshot](github/push-existing-repo-to-origin.png))
-- Invite a collaborator with the name "epassi-group":
-    - Navigate
-      to `Settings` > `Access` > `Collaborators` >
-      `Add People` ([See screenshot](github/manage-repository-access.png))
-    - Locate the account `epassi-group` and
-      click
-      `Add epassi-group to this repository` ([See screenshot](github/invite-collaborator-to-repository.png))
-- Send an email to `recruitment-task@epassi.com` and your technical recruiters
-  as recipients.\
-  Provide information indicating that the repository has been shared, including
-  the repository name.\
-  Then we will be able to continue the Recruitment process.
 
 ## Define relationships:
 
@@ -393,7 +373,7 @@ Upon completing your assignment, please follow the steps below:
 - A **Bookstore** can have many **Books** (One-to-Many).
 - A **Bookstore** can also have one **Inventory** (One-to-One).
 
-## feedback from epassi
+## feedback from org
 
 There were failing tests in all three tasks
 

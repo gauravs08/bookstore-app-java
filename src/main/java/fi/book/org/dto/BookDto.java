@@ -30,5 +30,5 @@ public class BookDto {
     @DecimalMin(value = "0.00", message = "Book price must be higher than 0.00")
     private BigDecimal price;
 
-    private Long bookstoreId;
+    private Long bookstore_id;
 }
