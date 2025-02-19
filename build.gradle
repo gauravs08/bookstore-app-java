@@ -10,7 +10,7 @@ plugins {
     id 'jacoco'
 }
 
-group = 'fi.epassi'
+group = 'fi.book.org'
 
 jacoco {
     toolVersion = "0.8.11"
@@ -67,7 +67,10 @@ dependencies {
     implementation 'org.springframework.security:spring-security-web'
     implementation 'org.springframework.security:spring-security-oauth2-jose:6.2.0'
     implementation 'org.springframework.security:spring-security-oauth2-resource-server:6.2.3'
-    implementation 'io.jsonwebtoken:jjwt:0.12.3'
+//    implementation 'io.jsonwebtoken:jjwt:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6' // For JSON parsing
 
     // -- DB
     implementation 'com.h2database:h2:2.2.224'

@@ -200,7 +200,7 @@ Available REST API methods:
     ```
 
 7. Update Inventory for a book by ISBN
-   `UPDATE /api/v1/inventory/isbn/{isbn}/copies`, responds with body of
+   `PUT /api/v1/inventory/isbn/{isbn}/copies`, responds with body of
    inventory,
    response status 200 OK.
 
@@ -283,7 +283,11 @@ used endpoints for performance monitoring:
 
 ## Swagger-ui
 
-http://localhost:8080/swagger-ui/index.html
+http://localhost:8080/webjars/swagger-ui/index.html#/
+http://localhost:8080/swagger-ui.html
+
+## Api doc json
+http://localhost:8080/v3/api-docs
 
 ## Test Coverage
 
@@ -312,7 +316,7 @@ repository.
   Inventory).
 
 
-- **Assigment description**:\
+- Assignment **description**:\
   You need to add the possibility to store information about how many books we
   have in our global inventory.\
   Also, when introducing such feature, we should have an API with capabilities

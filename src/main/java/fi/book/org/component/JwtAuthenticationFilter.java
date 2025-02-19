@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             return userDetailsService.findByUsername(username)  // Fetch user details using username from token
                     .flatMap(userDetails -> {
                         // Validate the token with the user details
-                        if (jwtUtil.validateToken(token, userDetails)) {
+                        if (jwtUtil.isTokenValid(token, userDetails)) {
                             // Create the authentication token for security context
                             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities());

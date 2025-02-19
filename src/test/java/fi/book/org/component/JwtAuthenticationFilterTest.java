@@ -38,7 +38,7 @@ public class JwtAuthenticationFilterTest {
         when(request.getHeaders()).thenReturn(headers);
         when(jwtUtil.extractUsername("test-token")).thenReturn("testuser");
         when(userDetailsService.findByUsername("testuser")).thenReturn(Mono.just(userDetails));
-        when(jwtUtil.validateToken("test-token", userDetails)).thenReturn(true);
+        when(jwtUtil.isTokenValid("test-token", userDetails)).thenReturn(true);
         when(chain.filter(any())).thenReturn(Mono.empty());
 
         // Act
@@ -48,7 +48,7 @@ public class JwtAuthenticationFilterTest {
         StepVerifier.create(result)
                 .verifyComplete();
 
-        verify(jwtUtil).validateToken("test-token", userDetails);
+        verify(jwtUtil).isTokenValid("test-token", userDetails);
         verify(chain).filter(exchange);
     }
 
