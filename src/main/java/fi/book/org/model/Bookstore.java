@@ -4,11 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,10 +31,4 @@ public class Bookstore {
 
     @NotBlank
     private String address;
-
-    @OneToMany(mappedBy = "bookstore", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookModel> books;
-
-    @OneToOne(mappedBy = "bookstore", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Inventory inventory;
 }

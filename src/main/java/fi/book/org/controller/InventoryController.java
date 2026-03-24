@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,7 +22,6 @@ import fi.book.org.services.InventoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -30,17 +30,22 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/inventory")
-@SecurityRequirement(name = "bearerAuth") // Apply JWT security
+@SecurityRequirement(name = "bearerAuth")
 public class InventoryController {
 
     private final InventoryService inventoryService;
 
     @GetMapping(value = "/isbn/{isbn}/copies", produces = APPLICATION_JSON_VALUE)
-    public Flux<ApiResponse<InventoryDto>> getInventoryCopiesByIsbn(
+    public Mono<ApiResponse<List<InventoryDto>>> getInventoryCopiesByIsbn(
             @PathVariable("isbn") @Validated UUID id) {
         return inventoryService.getCopiesByIsbn(id)
-                .map(ApiResponse::ok)
-                .switchIfEmpty(Mono.error(new InventoryNotFoundException("ISBN", id.toString())));
+                .collectList()
+                .flatMap(list -> {
+                    if (list.isEmpty()) {
+                        return Mono.error(new InventoryNotFoundException("ISBN", id.toString()));
+                    }
+                    return Mono.just(ApiResponse.ok(list));
+                });
     }
 
     @GetMapping(value = "/author/{author}/copies", produces = APPLICATION_JSON_VALUE)
@@ -63,8 +68,8 @@ public class InventoryController {
     public Mono<ApiResponse<UUID>> updateInventoriesCopiesByIsbn(
             @PathVariable("isbn") @Validated UUID isbn,
             @RequestParam(value = "copies") Integer copies,
-            @RequestParam(value = "bookstore_id") Long bookstore_id) {
-        return inventoryService.updateInventory(isbn, copies, bookstore_id)
+            @RequestParam(value = "bookstore_id") Long bookstoreId) {
+        return inventoryService.updateInventory(isbn, copies, bookstoreId)
                 .map(ApiResponse::ok)
                 .onErrorResume(e -> {
                     if (e instanceof BookstoreNotFoundException) {

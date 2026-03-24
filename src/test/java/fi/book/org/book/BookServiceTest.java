@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 import fi.book.org.api.ApiResponsePage;
@@ -20,10 +19,7 @@ import fi.book.org.dto.BookDto;
 import fi.book.org.exception.BookCreateException;
 import fi.book.org.exception.BookNotFoundException;
 import fi.book.org.model.BookModel;
-import fi.book.org.model.Bookstore;
-import fi.book.org.model.Inventory;
 import fi.book.org.repository.BookRepository;
-import fi.book.org.repository.InventoryRepository;
 import fi.book.org.services.BookService;
 import fi.book.org.services.InventoryService;
 import reactor.core.publisher.Flux;
@@ -48,8 +44,6 @@ class BookServiceTest {
 
     @Mock
     private BookRepository bookRepository;
-    @Mock
-    private InventoryRepository inventoryRepository;
 
     @InjectMocks
     private BookService bookService;
@@ -59,18 +53,12 @@ class BookServiceTest {
     private UUID bookIsbn;
     private BookModel bookModel;
     private BookDto bookDto;
-    private Bookstore bookStore;
-    private Inventory inventory;
 
     @BeforeEach
     void setUp() {
         bookIsbn = UUID.randomUUID();
-        inventory = new Inventory();
-        inventory.setId(bookIsbn);
-        inventory.setCopies(10);
 
         bookModel = new BookModel(bookIsbn, "Spring Reactive", "Josh Long", BigDecimal.valueOf(39.99), 100L, true);
-        bookStore = new Bookstore(100L, "Address1", "123456789", "bookstore1@example.com", List.of(bookModel), inventory);
 
         bookDto = BookDto.builder()
                 .id(bookIsbn)
@@ -221,6 +209,17 @@ class BookServiceTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenUpdatingNonExistentBook() {
+        when(bookRepository.findById(bookIsbn)).thenReturn(Mono.empty());
+
+        StepVerifier.create(bookService.updateBook(bookDto))
+                .expectErrorSatisfies(throwable -> {
+                    assertInstanceOf(BookNotFoundException.class, throwable);
+                })
+                .verify();
+    }
+
+    @Test
     void shouldGetBookByIsbn() {
         when(bookRepository.findById(bookIsbn)).thenReturn(Mono.just(bookModel));
 
@@ -258,10 +257,13 @@ class BookServiceTest {
 
     @Test
     void shouldThrowExceptionWhenBookNotFound() {
-        when(bookRepository.findById(bookIsbn)).thenThrow(BookNotFoundException.class);
+        when(bookRepository.findById(bookIsbn)).thenReturn(Mono.empty());
 
-        assertThrows(RuntimeException.class, () -> bookService.getBookByIsbn(bookIsbn).block());
-        verify(bookRepository, times(1)).findById(bookIsbn);
+        StepVerifier.create(bookService.getBookByIsbn(bookIsbn))
+                .expectErrorSatisfies(throwable -> {
+                    assertInstanceOf(BookNotFoundException.class, throwable);
+                })
+                .verify();
     }
 
     @Test
@@ -271,6 +273,36 @@ class BookServiceTest {
         StepVerifier.create(bookService.getBookByIsbn(bookIsbn))
                 .expectNextMatches(dto -> dto.getTitle().equals("Spring Reactive"))
                 .verifyComplete();
+    }
+
+    @Test
+    void shouldMapBookModelToDto() {
+        BookDto dto = bookService.toBookDto(bookModel);
+
+        assertEquals(bookModel.getId(), dto.getId());
+        assertEquals(bookModel.getTitle(), dto.getTitle());
+        assertEquals(bookModel.getAuthor(), dto.getAuthor());
+        assertEquals(bookModel.getPrice(), dto.getPrice());
+        assertEquals(bookModel.getBookstoreId(), dto.getBookstore_id());
+    }
+
+    @Test
+    void shouldMapBookDtoToModel() {
+        BookDto dto = BookDto.builder()
+                .id(bookIsbn)
+                .title("Test")
+                .author("Author")
+                .price(BigDecimal.TEN)
+                .bookstore_id(42L)
+                .build();
+
+        BookModel model = bookService.toBookModel(dto);
+
+        assertEquals(dto.getId(), model.getId());
+        assertEquals(dto.getTitle(), model.getTitle());
+        assertEquals(dto.getAuthor(), model.getAuthor());
+        assertEquals(dto.getPrice(), model.getPrice());
+        assertEquals(dto.getBookstore_id(), model.getBookstoreId());
     }
 
 }

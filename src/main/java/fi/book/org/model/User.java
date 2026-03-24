@@ -9,8 +9,6 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.Set;
 import java.util.UUID;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,11 +26,10 @@ public class User implements Persistable<UUID> {
     @Transient
     public boolean isNew = true;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String username;
     private String password;
-    @Transient // Prevents roles from being persisted automatically
+    @Transient
     private Set<String> roles;
 
 }

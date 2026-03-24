@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import fi.book.org.api.ApiResponse;
@@ -33,7 +32,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/books")
-@SecurityRequirement(name = "bearerAuth") // Apply JWT security
+@SecurityRequirement(name = "bearerAuth")
 public class BookController {
 
     private final BookService bookService;
@@ -48,19 +47,13 @@ public class BookController {
         return bookService.getBooks(author, title, bookstoreId, PageRequest.of(page, size, Sort.unsorted()));
     }
 
-    @PostMapping
-    public Mono<ApiResponse<UUID>> createBook(
-            @RequestParam UUID id,
-            @RequestParam String title,
-            @RequestParam String author,
-            @RequestParam BigDecimal price,
-            @RequestParam("bookstore_id") Long bookstoreId) {
-        BookDto bookDto = new BookDto(id, title, author, price, bookstoreId);
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    public Mono<ApiResponse<UUID>> createBook(@RequestBody @Validated BookDto bookDto) {
         return bookService.createBook(bookDto)
                 .map(ApiResponse::ok)
                 .onErrorResume(e -> {
                     log.error("Error creating book with ISBN {}: {}", bookDto.getId(), e.getMessage(), e);
-                    return Mono.error(new BookCreateException("ISBN", bookDto.getId().toString())); // Pass the original exception as a cause
+                    return Mono.error(new BookCreateException("ISBN", bookDto.getId().toString()));
                 });
     }
 

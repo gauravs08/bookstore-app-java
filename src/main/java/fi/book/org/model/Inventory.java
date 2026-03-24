@@ -8,7 +8,6 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.UUID;
 
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,14 +21,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table("inventory")
-public class Inventory implements Persistable {
+public class Inventory implements Persistable<UUID> {
     @Id
     @Column("id")
     private UUID id;
 
     private int copies;
 
-    @OneToOne
     @Column("bookstore_id")
     private Long bookstoreId;
 

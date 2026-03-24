@@ -31,13 +31,13 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final BookstoreRepository bookstoreRepository;
 
-    @Cacheable(cacheNames = "copiesByAuthor", key = "{#author}")
+    @Cacheable(cacheNames = "copiesByAuthor", key = "#author")
     public Mono<Map<String, Integer>> getCopiesByAuthorBookstore(String author) {
         Flux<BookModel> books = bookRepository.findByAuthorContainingIgnoreCase(author, Pageable.ofSize(20));
         return getCopiesMapByBookStoreId(books);
     }
 
-    @Cacheable(cacheNames = "copiesByTitle", key = "{#title}")
+    @Cacheable(cacheNames = "copiesByTitle", key = "#title")
     public Mono<Map<String, Integer>> getCopiesByTitleBookstore(String title) {
         Flux<BookModel> books = bookRepository.findByTitleContainingIgnoreCase(title, Pageable.ofSize(20));
         return getCopiesMapByBookStoreId(books);
@@ -58,7 +58,7 @@ public class InventoryService {
                 });
     }
 
-    @Cacheable(cacheNames = "copiesByIsbn", key = "{#id}")
+    @Cacheable(cacheNames = "copiesByIsbn", key = "#id")
     public Flux<InventoryDto> getCopiesByIsbn(UUID id) {
         return inventoryRepository.findInventoriesById(id)
                 .map(this::toInventoryDto)
