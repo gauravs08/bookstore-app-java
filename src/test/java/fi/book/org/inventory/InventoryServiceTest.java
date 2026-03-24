@@ -8,11 +8,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import fi.book.org.dto.BookDto;
 import fi.book.org.dto.InventoryDto;
 import fi.book.org.dto.InventoryGlobalDto;
 import fi.book.org.exception.BookstoreNotFoundException;
@@ -53,7 +51,6 @@ class InventoryServiceTest {
     private Inventory inventory;
     private UUID bookIsbn;
     private BookModel bookModel;
-    private BookDto bookDto;
     private Bookstore bookStore;
 
     @BeforeEach
@@ -66,7 +63,7 @@ class InventoryServiceTest {
 
         bookIsbn = UUID.randomUUID();
         bookModel = new BookModel(bookIsbn, "Spring Reactive", "Josh Long", BigDecimal.valueOf(39.99), 100L, true);
-        bookStore = new Bookstore(100L, "Address1", "123456789", "bookstore1@example.com", List.of(bookModel), inventory);
+        bookStore = new Bookstore(100L, "Bookstore 1", "bookstore1@example.com", "Address1");
         inventory.setBookstoreId(bookStore.getId());
     }
 
@@ -101,6 +98,27 @@ class InventoryServiceTest {
 
     }
 
+    @Test
+    void shouldReturnEmptyMapWhenNoBooksFoundByAuthor() {
+        when(bookRepository.findByAuthorContainingIgnoreCase(eq("Unknown"), any())).thenReturn(Flux.empty());
+
+        Mono<Map<String, Integer>> result = inventoryService.getCopiesByAuthorBookstore("Unknown");
+
+        StepVerifier.create(result)
+                .expectNextMatches(Map::isEmpty)
+                .verifyComplete();
+    }
+
+    @Test
+    void shouldReturnEmptyMapWhenNoBooksFoundByTitle() {
+        when(bookRepository.findByTitleContainingIgnoreCase(eq("Unknown"), any())).thenReturn(Flux.empty());
+
+        Mono<Map<String, Integer>> result = inventoryService.getCopiesByTitleBookstore("Unknown");
+
+        StepVerifier.create(result)
+                .expectNextMatches(Map::isEmpty)
+                .verifyComplete();
+    }
 
     @Test
     void shouldReturnInventoryForExistingIsbn() {
@@ -202,6 +220,17 @@ class InventoryServiceTest {
     }
 
     @Test
+    void shouldReturnZeroTotalCopiesWhenNoInventory() {
+        when(inventoryRepository.findAll()).thenReturn(Flux.empty());
+
+        Mono<InventoryGlobalDto> result = inventoryService.getTotalCopies();
+
+        StepVerifier.create(result)
+                .expectNextMatches(dto -> dto.getTotal_copies().equals(0L))
+                .verifyComplete();
+    }
+
+    @Test
     void shouldUpdateOrCreateInventory() {
         UUID bookId = UUID.randomUUID();
         Long bookstoreId = 1001L;
@@ -234,8 +263,8 @@ class InventoryServiceTest {
                 .verifyComplete();
 
         verify(inventoryRepository).findInventoriesById(bookId);
-        verify(inventoryRepository).save(argThat(inventory ->
-                inventory.getCopies() == 6 && !inventory.isNew()));
+        verify(inventoryRepository).save(argThat(inv ->
+                inv.getCopies() == 6 && !inv.isNew()));
 
         when(inventoryRepository.findInventoriesById(bookId))
                 .thenReturn(Flux.empty());
@@ -247,8 +276,8 @@ class InventoryServiceTest {
                 .expectSubscription()
                 .verifyComplete();
 
-        verify(inventoryRepository, times(2)).findInventoriesById(bookId); // Once for update, once for create
-        verify(inventoryRepository, times(2)).save(any(Inventory.class)); // Once for each scenario
+        verify(inventoryRepository, times(2)).findInventoriesById(bookId);
+        verify(inventoryRepository, times(2)).save(any(Inventory.class));
     }
 
 }

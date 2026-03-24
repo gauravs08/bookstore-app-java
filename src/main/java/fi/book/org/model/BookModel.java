@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Table("books")
-public class BookModel implements Persistable {
+public class BookModel implements Persistable<UUID> {
 
     @Id
     @Column("id")

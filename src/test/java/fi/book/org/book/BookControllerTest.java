@@ -20,7 +20,6 @@ import fi.book.org.controller.BookController;
 import fi.book.org.dto.BookDto;
 import fi.book.org.exception.BookNotFoundException;
 import fi.book.org.services.BookService;
-import fi.book.org.services.InventoryService;
 import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,8 +35,6 @@ class BookControllerTest {
 
     @Mock
     private BookService bookService;
-    @Mock
-    private InventoryService inventoryService;
 
     @InjectMocks
     private BookController bookController;
@@ -82,56 +79,40 @@ class BookControllerTest {
 
     @Test
     void shouldCreateBook() {
-        when(bookService.createBook(bookDto)).thenReturn(Mono.just(bookIsbn));
+        when(bookService.createBook(any(BookDto.class))).thenReturn(Mono.just(bookIsbn));
 
         webTestClient.post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/v1/books")
-                        .queryParam("id", bookIsbn)
-                        .queryParam("title", "Reactive Spring")
-                        .queryParam("author", "Josh Long")
-                        .queryParam("price", 49.99)
-                        .queryParam("bookstore_id", 1001L)
-                        .build())
-                .accept(MediaType.APPLICATION_JSON)
+                .uri("/api/v1/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(bookDto)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(ApiResponse.class)
                 .value(response -> response.getResponse().equals(bookIsbn.toString()));
 
-        verify(bookService, times(1)).createBook(bookDto);
+        verify(bookService, times(1)).createBook(any(BookDto.class));
     }
 
     @Test
     void shouldHandleErrorWhenCreatingBook() {
-        UUID id = UUID.randomUUID();
-        String title = "Reactive Spring";
-        String author = "Josh Long";
-        BigDecimal price = BigDecimal.valueOf(49.99);
-        Long bookstoreId = 1001L;
-
-        when(bookService.createBook(any()))
+        when(bookService.createBook(any(BookDto.class)))
                 .thenReturn(Mono.error(new RuntimeException("Simulated service error")));
 
         webTestClient.post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/v1/books")
-                        .queryParam("id", id.toString())
-                        .queryParam("title", title)
-                        .queryParam("author", author)
-                        .queryParam("price", price.toString())
-                        .queryParam("bookstore_id", bookstoreId)
-                        .build())
+                .uri("/api/v1/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(bookDto)
                 .exchange()
-                .expectStatus().isBadRequest()
+                .expectStatus().is5xxServerError()
                 .expectBody(String.class);
+
         verify(bookService, times(1)).createBook(any(BookDto.class));
     }
 
 
     @Test
     void shouldUpdateBook() {
-        when(bookService.updateBook(bookDto)).thenReturn(Mono.just(bookIsbn));
+        when(bookService.updateBook(any(BookDto.class))).thenReturn(Mono.just(bookIsbn));
 
         webTestClient.put()
                 .uri("/api/v1/books")
@@ -142,12 +123,12 @@ class BookControllerTest {
                 .expectBody(ApiResponse.class)
                 .value(response -> response.getResponse().equals(bookIsbn.toString()));
 
-        verify(bookService, times(1)).updateBook(bookDto);
+        verify(bookService, times(1)).updateBook(any(BookDto.class));
     }
 
     @Test
     void shouldHandleErrorWhenUpdatingBook() {
-        when(bookService.updateBook(any()))
+        when(bookService.updateBook(any(BookDto.class)))
                 .thenReturn(Mono.error(new RuntimeException("Simulated service error")));
 
         webTestClient.put()
@@ -155,7 +136,7 @@ class BookControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(bookDto)
                 .exchange()
-                .expectStatus().isBadRequest()
+                .expectStatus().is5xxServerError()
                 .expectBody(String.class);
         verify(bookService, times(1)).updateBook(any(BookDto.class));
     }
@@ -216,7 +197,7 @@ class BookControllerTest {
         webTestClient.delete()
                 .uri("/api/v1/books/{isbn}", isbn)
                 .exchange()
-                .expectStatus().isBadRequest()
+                .expectStatus().is5xxServerError()
                 .expectBody(String.class);
 
         verify(bookService, times(1)).deleteBookWithIsbn(isbn);

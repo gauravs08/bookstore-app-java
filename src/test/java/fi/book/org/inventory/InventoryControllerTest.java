@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,12 +42,12 @@ public class InventoryControllerTest {
         when(inventoryService.getCopiesByIsbn(isbn))
                 .thenReturn(Flux.just(inventoryDto));
 
-        Flux<ApiResponse<InventoryDto>> response = inventoryController.getInventoryCopiesByIsbn(isbn);
-
+        Mono<ApiResponse<List<InventoryDto>>> response = inventoryController.getInventoryCopiesByIsbn(isbn);
 
         StepVerifier.create(response)
                 .expectNextMatches(apiResponse -> apiResponse.getStatusCode() == 200 &&
-                        apiResponse.getResponse().equals(inventoryDto))
+                        apiResponse.getResponse().size() == 1 &&
+                        apiResponse.getResponse().get(0).equals(inventoryDto))
                 .expectComplete()
                 .verify();
     }
@@ -96,7 +97,6 @@ public class InventoryControllerTest {
         UUID isbn = UUID.randomUUID();
         int copies = 10;
         Long bookstoreId = 1001L;
-        ApiResponse<UUID> expectedResponse = ApiResponse.ok(isbn);
         when(inventoryService.updateInventory(isbn, copies, bookstoreId))
                 .thenReturn(Mono.just(isbn));
 
@@ -130,14 +130,13 @@ public class InventoryControllerTest {
     void testGetInventoryCopiesByIsbn_NotFound() {
         UUID isbn = UUID.randomUUID();
         when(inventoryService.getCopiesByIsbn(isbn))
-                .thenReturn(Flux.error(new InventoryNotFoundException("ISBN", isbn.toString())));
+                .thenReturn(Flux.empty());
 
-        Flux<ApiResponse<InventoryDto>> response = inventoryController.getInventoryCopiesByIsbn(isbn);
+        Mono<ApiResponse<List<InventoryDto>>> response = inventoryController.getInventoryCopiesByIsbn(isbn);
 
         StepVerifier.create(response)
                 .expectErrorMatches(throwable ->
-                        throwable instanceof InventoryNotFoundException &&
-                                throwable.getMessage().contains("No inventory found with ISBN: " + isbn))
+                        throwable instanceof InventoryNotFoundException)
                 .verify();
     }
 

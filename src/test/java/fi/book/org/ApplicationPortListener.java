@@ -1,6 +1,6 @@
 package fi.book.org;
 
-import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
+import org.springframework.boot.web.reactive.context.ReactiveWebServerInitializedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public class ApplicationPortListener {
     private int serverPort;
 
     @EventListener
-    public void onApplicationEvent(final ServletWebServerInitializedEvent event) {
+    public void onApplicationEvent(final ReactiveWebServerInitializedEvent event) {
         serverPort = event.getWebServer().getPort();
     }
 

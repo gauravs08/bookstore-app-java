@@ -64,10 +64,8 @@ public class AuthControllerTest {
     }
 
 
-    // Successful user login with correct credentials returns JWT token
     @Test
     public void test_login_with_valid_credentials_returns_token() {
-        // Arrange
         String username = "testUser";
         String password = "password";
         String encodedPassword = "encodedPassword";
@@ -80,36 +78,30 @@ public class AuthControllerTest {
         when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
         when(jwtUtil.generateToken(userDetails)).thenReturn(token);
 
-        // Act
         StepVerifier.create(authController.login(authRequest))
                 .expectNextMatches(response -> {
                     assertNotNull(response);
-                    assertTrue(response.getStatusCode() == 200); // Assuming ApiResponse has a success flag
+                    assertTrue(response.getStatusCode() == 200);
                     assertEquals(token, ((AuthResponse) response.getResponse()).getToken());
                     return true;
                 })
                 .verifyComplete();
 
-        // Assert
         verify(userDetailsService).findByUsername(username);
         verify(passwordEncoder).matches(password, encodedPassword);
         verify(jwtUtil).generateToken(userDetails);
     }
 
-    // Invalid password returns AuthException with appropriate message
     @Test
     public void test_invalid_password_throws_auth_exception() {
-        // Arrange
         AuthRequest authRequest = new AuthRequest("testUser", "wrongPassword");
         UserDetails userDetails = new org.springframework.security.core.userdetails.User("testUser", encodedPassword, new ArrayList<>());
 
         when(userDetailsService.findByUsername("testUser")).thenReturn(Mono.just(userDetails));
         when(passwordEncoder.matches("wrongPassword", encodedPassword)).thenReturn(false);
 
-        // Act
         Mono<ApiResponse<Object>> result = authController.login(authRequest);
 
-        // Assert
         StepVerifier.create(result)
                 .expectErrorMatches(throwable ->
                         throwable instanceof AuthException
@@ -118,7 +110,28 @@ public class AuthControllerTest {
                 .verify();
     }
 
-    // New user registration with valid username and password returns CREATED status
+    @Test
+    public void test_login_with_blank_username_throws_auth_exception() {
+        AuthRequest authRequest = new AuthRequest("", "password");
+
+        StepVerifier.create(authController.login(authRequest))
+                .expectErrorMatches(throwable ->
+                        throwable instanceof AuthException
+                                && throwable.getMessage().contains("Username and password must not be empty"))
+                .verify();
+    }
+
+    @Test
+    public void test_login_with_null_password_throws_auth_exception() {
+        AuthRequest authRequest = new AuthRequest("user", null);
+
+        StepVerifier.create(authController.login(authRequest))
+                .expectErrorMatches(throwable ->
+                        throwable instanceof AuthException
+                                && throwable.getMessage().contains("Username and password must not be empty"))
+                .verify();
+    }
+
     @Test
     public void test_register_new_user_returns_created() {
         AuthRequest request = new AuthRequest("newuser", "password123");
@@ -140,7 +153,6 @@ public class AuthControllerTest {
                 .verifyComplete();
     }
 
-    // Attempting to register with existing username returns BAD_REQUEST
     @Test
     public void test_register_existing_username_returns_bad_request() {
         AuthRequest request = new AuthRequest("existinguser", "password123");
@@ -179,5 +191,15 @@ public class AuthControllerTest {
                 .verifyComplete();
     }
 
+    @Test
+    public void test_login_user_not_found_throws_auth_exception() {
+        AuthRequest authRequest = new AuthRequest("nonexistent", "password");
+        when(userDetailsService.findByUsername("nonexistent")).thenReturn(Mono.empty());
+
+        StepVerifier.create(authController.login(authRequest))
+                .expectErrorMatches(throwable ->
+                        throwable instanceof AuthException)
+                .verify();
+    }
 
 }

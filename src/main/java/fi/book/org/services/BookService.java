@@ -44,7 +44,7 @@ public class BookService {
                 });
     }
 
-    @CacheEvict(key = "{#id}")
+    @CacheEvict(key = "#id")
     public Mono<Void> deleteBookWithIsbn(@NonNull UUID id) {
         return bookRepository.deleteById(id)
                 .onErrorResume(e -> {
@@ -54,14 +54,14 @@ public class BookService {
 
     }
 
-    @Cacheable(key = "{#id}")
-    public Mono<BookDto> getBookByIsbn(@NonNull UUID id) throws BookNotFoundException {
+    @Cacheable(key = "#id")
+    public Mono<BookDto> getBookByIsbn(@NonNull UUID id) {
         return bookRepository.findById(id)
                 .map(this::toBookDto)
                 .switchIfEmpty(Mono.error(new BookNotFoundException("ISBN", id.toString())));
     }
 
-    @Cacheable(key = "{#author, #title, #bookstoreId}")
+    @Cacheable(key = "#author + '-' + #title + '-' + #bookstoreId")
     public Mono<ApiResponsePage<BookDto>> getBooks(String author, String title, Long bookstoreId, Pageable pageable) {
         Flux<BookModel> booksFlux;
 

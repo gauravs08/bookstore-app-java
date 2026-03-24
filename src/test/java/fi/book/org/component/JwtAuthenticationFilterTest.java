@@ -13,16 +13,15 @@ import reactor.test.StepVerifier;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 public class JwtAuthenticationFilterTest {
 
-    // Valid JWT token in Authorization header leads to successful authentication
     @Test
     public void test_valid_jwt_token_authentication_success() {
-        // Arrange
         JwtUtil jwtUtil = mock(JwtUtil.class);
         ReactiveUserDetailsService userDetailsService = mock(ReactiveUserDetailsService.class);
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, userDetailsService);
@@ -41,10 +40,8 @@ public class JwtAuthenticationFilterTest {
         when(jwtUtil.isTokenValid("test-token", userDetails)).thenReturn(true);
         when(chain.filter(any())).thenReturn(Mono.empty());
 
-        // Act
         Mono<Void> result = filter.filter(exchange, chain);
 
-        // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
@@ -52,10 +49,8 @@ public class JwtAuthenticationFilterTest {
         verify(chain).filter(exchange);
     }
 
-    // Missing Authorization header returns null token
     @Test
     public void test_missing_auth_header_returns_null() {
-        // Arrange
         JwtUtil jwtUtil = mock(JwtUtil.class);
         ReactiveUserDetailsService userDetailsService = mock(ReactiveUserDetailsService.class);
         JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, userDetailsService);
@@ -69,15 +64,92 @@ public class JwtAuthenticationFilterTest {
         when(request.getHeaders()).thenReturn(headers);
         when(chain.filter(exchange)).thenReturn(Mono.empty());
 
-        // Act
         Mono<Void> result = filter.filter(exchange, chain);
 
-        // Assert
         StepVerifier.create(result)
                 .verifyComplete();
 
         verify(chain).filter(exchange);
         verifyNoInteractions(jwtUtil);
         verifyNoInteractions(userDetailsService);
+    }
+
+    @Test
+    public void test_invalid_jwt_token_proceeds_without_authentication() {
+        JwtUtil jwtUtil = mock(JwtUtil.class);
+        ReactiveUserDetailsService userDetailsService = mock(ReactiveUserDetailsService.class);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, userDetailsService);
+
+        ServerWebExchange exchange = mock(ServerWebExchange.class);
+        ServerHttpRequest request = mock(ServerHttpRequest.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer invalid-token");
+        WebFilterChain chain = mock(WebFilterChain.class);
+        UserDetails userDetails = mock(UserDetails.class);
+
+        when(exchange.getRequest()).thenReturn(request);
+        when(request.getHeaders()).thenReturn(headers);
+        when(jwtUtil.extractUsername("invalid-token")).thenReturn("testuser");
+        when(userDetailsService.findByUsername("testuser")).thenReturn(Mono.just(userDetails));
+        when(jwtUtil.isTokenValid("invalid-token", userDetails)).thenReturn(false);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        Mono<Void> result = filter.filter(exchange, chain);
+
+        StepVerifier.create(result)
+                .verifyComplete();
+
+        verify(chain).filter(exchange);
+    }
+
+    @Test
+    public void test_auth_header_without_bearer_prefix_ignored() {
+        JwtUtil jwtUtil = mock(JwtUtil.class);
+        ReactiveUserDetailsService userDetailsService = mock(ReactiveUserDetailsService.class);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, userDetailsService);
+
+        ServerWebExchange exchange = mock(ServerWebExchange.class);
+        ServerHttpRequest request = mock(ServerHttpRequest.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Basic dXNlcjpwYXNz");
+        WebFilterChain chain = mock(WebFilterChain.class);
+
+        when(exchange.getRequest()).thenReturn(request);
+        when(request.getHeaders()).thenReturn(headers);
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        Mono<Void> result = filter.filter(exchange, chain);
+
+        StepVerifier.create(result)
+                .verifyComplete();
+
+        verify(chain).filter(exchange);
+        verifyNoInteractions(userDetailsService);
+    }
+
+    @Test
+    public void test_user_not_found_for_token_proceeds_without_auth() {
+        JwtUtil jwtUtil = mock(JwtUtil.class);
+        ReactiveUserDetailsService userDetailsService = mock(ReactiveUserDetailsService.class);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil, userDetailsService);
+
+        ServerWebExchange exchange = mock(ServerWebExchange.class);
+        ServerHttpRequest request = mock(ServerHttpRequest.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer some-token");
+        WebFilterChain chain = mock(WebFilterChain.class);
+
+        when(exchange.getRequest()).thenReturn(request);
+        when(request.getHeaders()).thenReturn(headers);
+        when(jwtUtil.extractUsername("some-token")).thenReturn("unknownuser");
+        when(userDetailsService.findByUsername("unknownuser")).thenReturn(Mono.empty());
+        when(chain.filter(exchange)).thenReturn(Mono.empty());
+
+        Mono<Void> result = filter.filter(exchange, chain);
+
+        StepVerifier.create(result)
+                .verifyComplete();
+
+        verify(jwtUtil, never()).isTokenValid(any(), any());
     }
 }

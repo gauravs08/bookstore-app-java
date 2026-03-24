@@ -3,15 +3,11 @@ package fi.book.org.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 import org.springframework.web.ErrorResponseException;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import lombok.Getter;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Getter
-@ResponseStatus(BAD_REQUEST)
 public class ApplicationException extends ErrorResponseException {
 
     public ApplicationException(String message) {

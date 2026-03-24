@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/workspace/DIY/shopping-cart-app/src/test -type f -name *.java)",
+      "Bash(wc:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(java:*)",
+      "Read(//c/Users/GASHA/.sdkman/**)",
+      "Read(//c/Users/GASHA/**)",
+      "Read(//c/workspace/DIY/bookstore-app-java/**)",
+      "Bash(echo \"JAVA_HOME=$JAVA_HOME\")",
+      "Bash(export JAVA_HOME=\"/c/Program Files/Eclipse Adoptium/jdk-21.0.6.7-hotspot\")",
+      "Bash(\"$JAVA_HOME/bin/java\" -version)",
+      "Bash(node:*)",
+      "Bash(./gradlew jacocoTestReport)",
+      "Bash(./gradlew jacocoTestCoverageVerification)",
+      "Bash(gradle wrapper:*)",
+      "Bash(chmod +x \"C:/workspace/DIY/shopping-cart-app/gradlew\")",
+      "Bash(./gradlew compileJava)",
+      "Bash(./gradlew clean:*)",
+      "Bash(./gradlew compileTestJava)",
+      "Bash(curl:*)",
+      "Bash(pkill -f \"gradlew\\\\|GradleDaemon\\\\|BookApplication\")",
+      "Bash(taskkill //F //IM java.exe)",
+      "Bash(echo:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
